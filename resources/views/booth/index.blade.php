@@ -70,7 +70,7 @@
                 onclick="openStartModal()"
                 title="{{ ($kioskStatus ?? 'buka') === 'buka' ? 'Sesi Terbuka — Foto bebas tanpa perlu pembayaran' : 'Sesi Terkunci — Pembayaran QRIS diperlukan' }}"
                 class="absolute rounded-full cursor-pointer hover:scale-[1.02] active:scale-95 transition-all duration-200 z-10"
-                style="left: 29.8%; top: 57.4%; width: 40.4%; height: 12.8%;">
+                style="left: 30.5%; top: 62.2%; width: 39.0%; height: 12.2%;">
             
             @if(($kioskStatus ?? 'buka') === 'buka')
                 <!-- Pill Mode BUKA (Hijau Emas) -->
