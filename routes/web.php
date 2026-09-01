@@ -70,6 +70,7 @@ Route::get('/gallery/{booking_code}/download-zip', [GalleryController::class, 'd
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // 5 Halaman Utama Studio Sesuai Desain
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/kiosk/status', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateKioskStatus'])->name('kiosk.status');
     Route::get('/session-control', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'sessionControl'])->name('session-control');
     Route::post('/session-control', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateSessionControl'])->name('session-control.update');
     Route::get('/gallery', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'gallery'])->name('gallery');

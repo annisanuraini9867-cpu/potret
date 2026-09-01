@@ -16,6 +16,7 @@ class BoothFlowTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        \Illuminate\Support\Facades\Cache::put('kiosk_status', 'tutup');
     }
 
     public function test_step1_select_template_renders_and_submits(): void

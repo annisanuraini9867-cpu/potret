@@ -35,13 +35,38 @@ class AdminDashboardController extends Controller
             ->take(8)
             ->get();
 
+        $kioskStatus = cache('kiosk_status', session('kiosk_status', 'buka'));
+
         return view('admin.dashboard', compact(
             'user',
             'todayEarnings',
             'totalSessions',
             'totalPrints',
-            'recentBookings'
+            'recentBookings',
+            'kioskStatus'
         ));
+    }
+
+    /**
+     * Update Status Kios (Buka / Tutup)
+     * - Buka: Sesi foto gratis tanpa pembayaran
+     * - Tutup: Sesi foto terkunci wajib pembayaran QRIS
+     */
+    public function updateKioskStatus(Request $request)
+    {
+        $request->validate([
+            'status' => 'required|in:buka,tutup',
+        ]);
+
+        $status = $request->input('status');
+        cache(['kiosk_status' => $status], now()->addDays(30));
+        session(['kiosk_status' => $status]);
+
+        $msg = ($status === 'buka') 
+            ? 'Status Kios berhasil diubah menjadi BUKA (Mode Bebas — Sesi foto langsung mulai tanpa perlu pembayaran).'
+            : 'Status Kios berhasil diubah menjadi TUTUP (Mode Terkunci — Sesi foto terkunci dan memerlukan pembayaran QRIS terlebih dahulu).';
+
+        return back()->with('success', $msg);
     }
 
     /**

@@ -92,14 +92,36 @@
                     </span>
                 </div>
 
-                <!-- Open / Close Toggle Buttons -->
-                <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-2xl">
-                    <button type="button" class="py-2 rounded-xl bg-white text-slate-900 font-bold text-xs shadow-sm flex items-center justify-center gap-1.5">
-                        <span>🔓</span> Buka
-                    </button>
-                    <button type="button" class="py-2 rounded-xl text-slate-500 font-bold text-xs hover:text-slate-900 flex items-center justify-center gap-1.5">
-                        <span>🔒</span> Tutup
-                    </button>
+                <!-- Open / Close Toggle Buttons (Interactive Sesuai Logika Buka / Tutup) -->
+                <div class="space-y-2">
+                    <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl">
+                        <form action="{{ route('admin.kiosk.status') }}" method="POST" class="w-full">
+                            @csrf
+                            <input type="hidden" name="status" value="buka">
+                            <button type="submit" 
+                                    class="w-full py-2.5 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 {{ ($kioskStatus ?? 'buka') === 'buka' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'text-slate-500 hover:text-slate-900' }}">
+                                <span>🔓</span> Buka
+                            </button>
+                        </form>
+
+                        <form action="{{ route('admin.kiosk.status') }}" method="POST" class="w-full">
+                            @csrf
+                            <input type="hidden" name="status" value="tutup">
+                            <button type="submit" 
+                                    class="w-full py-2.5 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 {{ ($kioskStatus ?? 'buka') === 'tutup' ? 'bg-rose-500 text-white shadow-md shadow-rose-500/30' : 'text-slate-500 hover:text-slate-900' }}">
+                                <span>🔒</span> Tutup
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Mode Indicator Note -->
+                    <div class="p-2.5 rounded-xl text-[11px] font-semibold {{ ($kioskStatus ?? 'buka') === 'buka' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/60' : 'bg-rose-50 text-rose-800 border border-rose-200/60' }}">
+                        @if(($kioskStatus ?? 'buka') === 'buka')
+                            <span>🔓 <strong>Mode Buka Aktif:</strong> Sesi foto langsung mulai tanpa perlu pembayaran.</span>
+                        @else
+                            <span>🔒 <strong>Mode Tutup Aktif:</strong> Sesi terkunci, wajib bayar QRIS sebelum foto.</span>
+                        @endif
+                    </div>
                 </div>
 
                 <!-- Hardware Device Status Rows -->

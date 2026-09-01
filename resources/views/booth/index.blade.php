@@ -90,6 +90,15 @@
                 📸
             </div>
 
+            <!-- Status Indicator Banner -->
+            <div class="p-2.5 rounded-2xl text-[11px] font-bold {{ ($kioskStatus ?? 'buka') === 'buka' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30' }}">
+                @if(($kioskStatus ?? 'buka') === 'buka')
+                    <span>🔓 <strong>Status Kios: BUKA</strong> — Sesi foto bebas tanpa perlu pembayaran!</span>
+                @else
+                    <span>🔒 <strong>Status Kios: TUTUP</strong> — Sesi terkunci, perlu pembayaran QRIS dahulu.</span>
+                @endif
+            </div>
+
             <div class="space-y-3">
                 <!-- Direct Button: Mulai Sesi Baru & Pilih Template -->
                 <a href="{{ route('booth.start.template') }}" 

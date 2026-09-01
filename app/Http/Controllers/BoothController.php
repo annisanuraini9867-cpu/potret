@@ -104,7 +104,8 @@ class BoothController extends Controller
      */
     public function index()
     {
-        return view('booth.index');
+        $kioskStatus = cache('kiosk_status', session('kiosk_status', 'buka'));
+        return view('booth.index', compact('kioskStatus'));
     }
 
     /**
@@ -164,6 +165,35 @@ class BoothController extends Controller
             'booth_session.template_id' => $templateId,
         ]);
 
+        $kioskStatus = cache('kiosk_status', session('kiosk_status', 'buka'));
+
+        // 1. Status BUKA = Sesi foto tidak perlu pembayaran, langsung mulai ke kamera!
+        if ($kioskStatus === 'buka') {
+            $user = User::where('role', 'customer')->first() ?? User::first();
+            $package = Package::first();
+            $bookingCode = 'PTD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+
+            Booking::create([
+                'user_id'        => $user ? $user->id : 1,
+                'customer_name'  => 'Pengunjung Kiosk (Mode Buka)',
+                'customer_email' => 'kiosk@potretdiri.com',
+                'customer_phone' => '08123456789',
+                'package_id'     => $package ? $package->id : 1,
+                'booking_code'   => $bookingCode,
+                'booking_date'   => date('Y-m-d'),
+                'start_time'     => date('H:i:s'),
+                'end_time'       => date('H:i:s', strtotime('+15 minutes')),
+                'total_amount'   => 0,
+                'status'         => 'confirmed',
+                'frame_design'   => $templateId,
+            ]);
+
+            session(['booth_session.booking_code' => $bookingCode]);
+
+            return redirect()->route('booth.session', $bookingCode);
+        }
+
+        // 2. Status TUTUP = Sesi terkunci, wajib pembayaran dahulu sebelum mulai sesi foto
         return redirect()->route('booth.start.copies');
     }
 
