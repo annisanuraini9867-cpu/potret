@@ -65,13 +65,36 @@
             <span class="sr-only">START PHOTO</span>
         </button>
 
-        <!-- 3. Bottom Center: Sesi Terkunci Pill Hotspot -->
+        <!-- 3. Dynamic Bottom Center Pill (Sesuai Status Buka vs Tutup) -->
         <button type="button" 
                 onclick="openStartModal()"
-                title="Sesi terkunci — klik untuk membuka sesi foto"
-                class="absolute rounded-full cursor-pointer hover:bg-white/10 active:scale-95 transition-all duration-150"
-                style="left: 30.0%; top: 57.7%; width: 38.3%; height: 12.6%;">
-            <span class="sr-only">Sesi terkunci — pembayaran diperlukan</span>
+                title="{{ ($kioskStatus ?? 'buka') === 'buka' ? 'Sesi Terbuka — Foto bebas tanpa perlu pembayaran' : 'Sesi Terkunci — Pembayaran QRIS diperlukan' }}"
+                class="absolute rounded-full cursor-pointer hover:scale-[1.02] active:scale-95 transition-all duration-200 z-10"
+                style="left: 29.8%; top: 57.4%; width: 40.4%; height: 12.8%;">
+            
+            @if(($kioskStatus ?? 'buka') === 'buka')
+                <!-- Pill Mode BUKA (Hijau Emas) -->
+                <div class="w-full h-full rounded-full bg-[#2A2107]/90 hover:bg-[#2A2107] border-2 border-emerald-400/80 shadow-2xl backdrop-blur-sm flex items-center justify-center gap-3.5 px-5 text-left transition-all">
+                    <div class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center justify-center text-lg flex-shrink-0 shadow-inner">
+                        🔓
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs sm:text-sm font-black text-emerald-300 tracking-wide uppercase leading-tight">Sesi Terbuka</div>
+                        <div class="text-[10px] sm:text-[11px] text-emerald-100/80 font-semibold truncate leading-tight">Foto bebas langsung tanpa pembayaran</div>
+                    </div>
+                </div>
+            @else
+                <!-- Pill Mode TUTUP (Emas Gelap Terkunci) -->
+                <div class="w-full h-full rounded-full bg-[#2A2107]/90 hover:bg-[#2A2107] border-2 border-amber-400/80 shadow-2xl backdrop-blur-sm flex items-center justify-center gap-3.5 px-5 text-left transition-all">
+                    <div class="w-9 h-9 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-lg flex-shrink-0 shadow-inner">
+                        🔒
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs sm:text-sm font-black text-amber-300 tracking-wide uppercase leading-tight">Sesi Terkunci</div>
+                        <div class="text-[10px] sm:text-[11px] text-amber-100/80 font-semibold truncate leading-tight">Pembayaran QRIS diperlukan sebelum foto</div>
+                    </div>
+                </div>
+            @endif
         </button>
 
     </div>
