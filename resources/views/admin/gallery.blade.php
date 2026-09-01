@@ -3,111 +3,86 @@
 @section('content')
 <div class="space-y-8">
 
-    <!-- Top 3 Stat Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        
-        <!-- Stat 1: Total Penyimpanan -->
-        <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100 space-y-3">
-            <span class="text-xs font-bold text-slate-500">Total Penyimpanan</span>
-            <div class="text-3xl font-black text-slate-900">142.8 <span class="text-xl font-bold text-slate-500">GB</span></div>
-            
-            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-[#F5BD23] rounded-full" style="width: 71%;"></div>
-            </div>
-            
-            <span class="text-[11px] text-slate-400 flex items-center gap-1">
-                <span>🕒</span> Sisa 57.2 GB dari 200 GB
-            </span>
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900">Galeri Foto</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Koleksi hasil jepretan foto studio dan kolase yang tersimpan di sistem</p>
         </div>
 
-        <!-- Stat 2: Total Foto Sesi -->
-        <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100 space-y-3">
-            <span class="text-xs font-bold text-slate-500">Total Foto Sesi</span>
-            <div class="text-3xl font-black text-slate-900">12,408 <span class="text-xl font-bold text-slate-500">Pics</span></div>
-            
-            <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-bold text-[10px]">+240 hari ini</span>
-                <span class="text-[11px] text-slate-400">Sejak 08:00 WIB</span>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('booth.index') }}" target="_blank" 
+               class="px-4 py-2.5 rounded-full bg-[#F5BD23] hover:bg-[#E5AC10] active:scale-95 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition flex items-center gap-1.5">
+                <span>+</span>
+                <span>Tambah / Mulai Sesi Foto</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Storage Usage Banner -->
+    <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-100 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">KAPASITAS PENYIMPANAN CLOUD</span>
+                <h3 class="text-xl font-black text-slate-900">{{ $usedStorageMB ?? 0 }} MB / 200 GB</h3>
+            </div>
+            <div class="text-xs font-bold text-slate-500">
+                Total File: <span class="text-slate-900 font-extrabold">{{ $totalPhotosCount ?? 0 }} Foto</span>
             </div>
         </div>
 
-        <!-- Stat 3: Auto-Cleanup -->
-        <div class="bg-white rounded-3xl p-7 shadow-sm border border-slate-100 space-y-3">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h4 class="font-extrabold text-sm text-slate-900">Auto–Cleanup</h4>
-                    <p class="text-xs text-slate-400">Hapus file > 14 hari otomatis</p>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-[#F5BD23] h-full rounded-full transition-all duration-500" style="width: {{ max(1, min(100, (($usedStorageMB ?? 0) / 204800) * 100)) }}%"></div>
+        </div>
+    </div>
+
+    <!-- Photos Grid or Empty State -->
+    @if(isset($photos) && $photos->count() > 0)
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            @foreach($photos as $photo)
+            <div class="bg-white rounded-3xl p-3 shadow-sm border border-slate-100 space-y-3 group hover:shadow-md transition">
+                <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 relative">
+                    <img src="{{ asset('storage/' . $photo->file_path) }}" 
+                         alt="{{ $photo->file_name }}" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    
+                    @if($photo->is_collage)
+                        <span class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#F5BD23] text-slate-950 text-[9px] font-black shadow">
+                            KOLASE
+                        </span>
+                    @endif
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" checked class="sr-only peer">
-                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#F5BD23]"></div>
-                </label>
+                <div class="px-1 text-xs">
+                    <div class="font-bold text-slate-900 truncate">{{ $photo->file_name }}</div>
+                    <div class="text-[10px] text-slate-400 font-mono">{{ $photo->booking ? $photo->booking->booking_code : 'Manual' }}</div>
+                </div>
             </div>
-            
-            <div class="pt-2 flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">AKTIF</span>
-                <span class="text-[11px] text-slate-400">Membantu menjaga kuota penyimpanan.</span>
-            </div>
+            @endforeach
         </div>
 
-    </div>
-
-    <!-- Filter Tabs (Semua Sesi, Minggu 4, Minggu 3, dll) -->
-    <div class="flex flex-wrap items-center gap-2">
-        <button type="button" class="px-5 py-2.5 rounded-full bg-[#F5BD23] text-slate-950 font-black text-xs shadow-sm">
-            Semua Sesi
-        </button>
-        <button type="button" class="px-5 py-2.5 rounded-full bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-sm border border-slate-200 transition">
-            Minggu 4 - Oktober
-        </button>
-        <button type="button" class="px-5 py-2.5 rounded-full bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-sm border border-slate-200 transition">
-            Minggu 3 - Oktober
-        </button>
-        <button type="button" class="px-5 py-2.5 rounded-full bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-sm border border-slate-200 transition">
-            Minggu 2 - Oktober
-        </button>
-        <button type="button" class="p-2.5 rounded-full bg-white hover:bg-slate-100 text-slate-700 text-xs shadow-sm border border-slate-200 transition" title="Pilih Tanggal">
-            📅
-        </button>
-    </div>
-
-    <!-- Photo Grid (Portrait Photography Cards) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
-        @php
-            $samplePortraits = [
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-            ];
-        @endphp
-
-        @foreach($samplePortraits as $idx => $imgUrl)
-        <div class="group relative rounded-2xl overflow-hidden bg-slate-900 aspect-[3/4] shadow-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <img src="{{ $imgUrl }}" alt="Photo {{ $idx + 1 }}" class="w-full h-full object-cover">
-            
-            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-3">
-                <a href="{{ $imgUrl }}" target="_blank" class="p-2 rounded-xl bg-white text-slate-900 font-bold text-xs shadow">
-                    🔍 Buka
+        <div class="pt-4">
+            {{ $photos->links() }}
+        </div>
+    @else
+        <!-- Empty State Galeri -->
+        <div class="bg-white rounded-3xl p-12 text-center border border-slate-100 space-y-4 max-w-xl mx-auto">
+            <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-3xl">
+                🖼
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-base font-black text-slate-900">Galeri Foto Masih Kosong</h3>
+                <p class="text-xs text-slate-400 max-w-sm mx-auto">Seluruh foto satuan dan hasil cetak kolase dari sesi pemotretan photo booth akan otomatis tersimpan di sini secara real-time.</p>
+            </div>
+            <div class="pt-2">
+                <a href="{{ route('booth.index') }}" target="_blank" 
+                   class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#F5BD23] hover:bg-[#E5AC10] active:scale-95 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition">
+                    <span>+</span>
+                    <span>Mulai Sesi Foto Pertama</span>
                 </a>
             </div>
         </div>
-        @endforeach
-    </div>
-
-    <!-- Muat Lebih Banyak Button -->
-    <div class="flex flex-col items-center justify-center pt-4 space-y-2">
-        <button type="button" class="w-10 h-10 rounded-full bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 flex items-center justify-center text-sm shadow transition">
-            ⌄
-        </button>
-        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">MUAT LEBIH BANYAK</span>
-    </div>
+    @endif
 
 </div>
 @endsection

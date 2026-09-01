@@ -59,9 +59,9 @@ class AdminPanelTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.gallery'));
         $response->assertStatus(200);
-        $response->assertSee('Total Penyimpanan');
-        $response->assertSee('Total Foto Sesi');
-        $response->assertSee('Semua Sesi');
+        $response->assertSee('Galeri Foto');
+        $response->assertSee('KAPASITAS PENYIMPANAN CLOUD');
+        $response->assertSee('Total File');
     }
 
     public function test_admin_qris_settings_page_and_update(): void

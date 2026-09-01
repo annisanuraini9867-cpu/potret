@@ -40,7 +40,7 @@
                 
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-black text-slate-900 flex items-center gap-2">
-                        <span>⏱</span>
+                        <span>🔄</span>
                         <span>Pengaturan Foto Ulang</span>
                     </h3>
                     
@@ -94,7 +94,7 @@
 
     </div>
 
-    <!-- KOLOM KANAN: Studio Preview & Log Aktivitas (4 Kolom) -->
+    <!-- KOLOM KANAN: Studio Preview & Log Aktivitas Real-Time (4 Kolom) -->
     <div class="lg:col-span-4 space-y-6">
         
         <!-- Studio Preview Box -->
@@ -117,39 +117,55 @@
                     <span class="font-bold text-emerald-600 uppercase">CONNECTED</span>
                 </div>
                 <div class="flex justify-between text-slate-500">
-                    <span>Sisa Penyimpanan:</span>
-                    <span class="font-bold text-slate-800">124.5 GB</span>
+                    <span>Sistem Studio:</span>
+                    <span class="font-bold text-slate-800">ONLINE</span>
                 </div>
             </div>
         </div>
 
-        <!-- Log Aktivitas Timeline -->
+        <!-- Log Aktivitas Real-Time Timeline -->
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4">
-            <div class="flex items-center gap-2 text-xs font-mono font-bold tracking-wider text-slate-500">
-                <span>⏱</span>
-                <span>LOG AKTIVITAS</span>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-xs font-mono font-bold tracking-wider text-slate-500">
+                    <span>⏱</span>
+                    <span>LOG AKTIVITAS</span>
+                </div>
+                <a href="{{ route('booth.index') }}" target="_blank" class="text-[11px] font-bold text-[#F5BD23] hover:underline">
+                    + Mulai Sesi
+                </a>
             </div>
 
             <div class="space-y-4 text-xs">
-                <div class="relative pl-4 border-l-2 border-amber-400 space-y-0.5">
-                    <div class="font-bold text-slate-800">Durasi diubah ke 15 Menit oleh Admin</div>
-                    <div class="text-[10px] text-slate-400">Baru saja</div>
-                </div>
-
-                <div class="relative pl-4 border-l-2 border-slate-200 space-y-0.5">
-                    <div class="font-bold text-slate-700">Fitur 'Foto Ulang' diaktifkan</div>
-                    <div class="text-[10px] text-slate-400">2 jam yang lalu</div>
-                </div>
-
-                <div class="relative pl-4 border-l-2 border-slate-200 space-y-0.5">
-                    <div class="font-bold text-slate-700">Reset pengaturan sesi ke default</div>
-                    <div class="text-[10px] text-slate-400">12 Feb 2026, 14:20</div>
-                </div>
+                @if(isset($recentActivities) && $recentActivities->count() > 0)
+                    @foreach($recentActivities as $act)
+                    <div class="relative pl-4 border-l-2 border-[#F5BD23] space-y-0.5">
+                        <div class="font-bold text-slate-800">
+                            {{ $act->customer_name ?? 'Pengunjung' }} — Sesi {{ $act->package ? $act->package->name : 'Photo Booth' }}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono">
+                            {{ $act->booking_code }} • {{ $act->created_at ? $act->created_at->diffForHumans() : 'Baru saja' }}
+                        </div>
+                    </div>
+                    @endforeach
+                @else
+                    <!-- Empty State Log Aktivitas -->
+                    <div class="py-6 text-center space-y-2">
+                        <p class="text-xs font-bold text-slate-600">Belum Ada Aktivitas Sesi</p>
+                        <p class="text-[11px] text-slate-400">Riwayat sesi foto akan tercatat otomatis di sini.</p>
+                        <div class="pt-1">
+                            <a href="{{ route('booth.index') }}" target="_blank" 
+                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold hover:bg-amber-100 transition">
+                                <span>+</span>
+                                <span>Mulai Sesi Sekarang</span>
+                            </a>
+                        </div>
+                    </div>
+                @endif
             </div>
 
-            <button type="button" class="w-full py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition">
-                Lihat Semua Riwayat
-            </button>
+            <a href="{{ route('admin.bookings.index') }}" class="block text-center w-full py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition">
+                Lihat Semua Riwayat Booking
+            </a>
         </div>
 
     </div>

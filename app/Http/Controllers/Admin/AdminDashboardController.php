@@ -8,31 +8,28 @@ use App\Models\Photo;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class AdminDashboardController extends Controller
 {
     /**
-     * 1. Beranda (Ringkasan Studio) - Sesuai Gambar 1
+     * 1. Beranda (Ringkasan Studio Real-Time) - Sesuai Gambar 1
      */
     public function index()
     {
         $user = Auth::user();
         
-        // Metrics
-        $todayEarnings = Booking::whereDate('booking_date', date('Y-m-d'))
+        // Real-Time Metrics from Database
+        $todayEarnings = (int) Booking::whereDate('booking_date', date('Y-m-d'))
             ->where('status', 'completed')
             ->sum('total_amount');
-        if ($todayEarnings == 0) $todayEarnings = 100000; // Demo fallback
 
         $totalSessions = Booking::count();
-        if ($totalSessions == 0) $totalSessions = 50; // Demo fallback
+        $totalPrints = Photo::count();
 
-        $totalPrints = Photo::count() * 4;
-        if ($totalPrints == 0) $totalPrints = 520; // Demo fallback
-
-        $recentBookings = Booking::with('package')
+        $recentBookings = Booking::with(['package', 'user', 'photos'])
             ->latest()
-            ->take(8)
+            ->take(10)
             ->get();
 
         $kioskStatus = cache('kiosk_status', session('kiosk_status', 'buka'));
@@ -45,6 +42,28 @@ class AdminDashboardController extends Controller
             'recentBookings',
             'kioskStatus'
         ));
+    }
+
+    /**
+     * Real-time API endpoint for dashboard live polling
+     */
+    public function realtimeStats()
+    {
+        $todayEarnings = (int) Booking::whereDate('booking_date', date('Y-m-d'))
+            ->where('status', 'completed')
+            ->sum('total_amount');
+
+        $totalSessions = Booking::count();
+        $totalPrints = Photo::count();
+        $kioskStatus = cache('kiosk_status', session('kiosk_status', 'buka'));
+
+        return response()->json([
+            'today_earnings' => $todayEarnings,
+            'today_earnings_formatted' => 'Rp ' . number_format($todayEarnings, 0, ',', '.'),
+            'total_sessions' => $totalSessions,
+            'total_prints'   => $totalPrints,
+            'kiosk_status'   => $kioskStatus,
+        ]);
     }
 
     /**
@@ -79,11 +98,14 @@ class AdminDashboardController extends Controller
         $retakeEnabled = session('studio_retake_enabled', true);
         $retakeLimit = session('studio_retake_limit', 'unlimited');
 
+        $recentActivities = Booking::with(['user', 'package'])->latest()->take(6)->get();
+
         return view('admin.session_control', compact(
             'user',
             'selectedDuration',
             'retakeEnabled',
-            'retakeLimit'
+            'retakeLimit',
+            'recentActivities'
         ));
     }
 
@@ -109,9 +131,15 @@ class AdminDashboardController extends Controller
     public function gallery()
     {
         $user = Auth::user();
-        $photos = Photo::with('booking')->latest()->take(20)->get();
+        $photos = Photo::with('booking')->latest()->paginate(16);
+        $totalPhotosCount = Photo::count();
+        
+        // Calculate real storage size in MB / GB
+        $totalBytes = Photo::sum('file_size');
+        $usedStorageMB = round($totalBytes / (1024 * 1024), 2);
+        $usedStorageGB = round($totalBytes / (1024 * 1024 * 1024), 2);
 
-        return view('admin.gallery', compact('user', 'photos'));
+        return view('admin.gallery', compact('user', 'photos', 'totalPhotosCount', 'usedStorageMB', 'usedStorageGB'));
     }
 
     /**
@@ -125,12 +153,17 @@ class AdminDashboardController extends Controller
         $pricePerPrint = session('qris_price_per_print', 20000);
         $selectedPackageCount = session('qris_package_count', 1);
 
+        $totalQrisTxn = Booking::where('status', 'completed')->where('total_amount', '>', 0)->count();
+        $totalQrisVolume = Booking::where('status', 'completed')->where('total_amount', '>', 0)->sum('total_amount');
+
         return view('admin.qris', compact(
             'user',
             'paymentGateway',
             'merchantId',
             'pricePerPrint',
-            'selectedPackageCount'
+            'selectedPackageCount',
+            'totalQrisTxn',
+            'totalQrisVolume'
         ));
     }
 
@@ -196,32 +229,21 @@ class AdminDashboardController extends Controller
     {
         $user = Auth::user();
         
-        $printJobs = [
-            [
-                'id' => '#PD-9921',
-                'document' => 'Session_Final_01.jpg',
-                'size' => '2.4 MB',
-                'status' => 'printing',
-                'status_label' => '● Mencetak',
-                'status_class' => 'bg-sky-100 text-sky-800',
-            ],
-            [
-                'id' => '#PD-9920',
-                'document' => 'Session_Preview_04.jpg',
-                'size' => '1.8 MB',
-                'status' => 'pending',
-                'status_label' => 'Menunggu',
-                'status_class' => 'bg-slate-100 text-slate-600',
-            ],
-            [
-                'id' => '#PD-9919',
-                'document' => 'Full_Grid_Test.pdf',
-                'size' => '4.2 MB',
-                'status' => 'completed',
-                'status_label' => '✓ Selesai',
-                'status_class' => 'bg-emerald-50 text-emerald-700',
-            ],
-        ];
+        $printJobs = Photo::where('is_collage', true)
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'id'           => '#PD-' . $p->id,
+                    'document'     => $p->file_name ?? 'Collage_Print.jpg',
+                    'size'         => round(($p->file_size ?: 2400000) / (1024 * 1024), 1) . ' MB',
+                    'status'       => 'completed',
+                    'status_label' => '✓ Selesai',
+                    'status_class' => 'bg-emerald-50 text-emerald-700',
+                ];
+            })
+            ->toArray();
 
         return view('admin.status', compact('user', 'printJobs'));
     }
