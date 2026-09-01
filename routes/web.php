@@ -15,8 +15,12 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// --- HALAMAN UTAMA / PUBLIK ---
+// --- OPENING / SPLASH SCREEN & HALAMAN UTAMA ---
 Route::get('/', function () {
+    return view('splash');
+})->name('splash');
+
+Route::get('/home', function () {
     $packages = Package::where('is_active', true)->get();
     return view('welcome', compact('packages'));
 })->name('home');

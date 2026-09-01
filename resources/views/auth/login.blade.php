@@ -21,12 +21,10 @@
 </head>
 <body class="min-h-full flex flex-col justify-between items-center py-10 px-4 antialiased selection:bg-[#F5BD23] selection:text-slate-900">
 
-    <!-- Top Logo Title -->
-    <div class="w-full text-center pt-2 pb-6">
+    <!-- Top Logo Title (Exact 3D Splash Logo Artwork) -->
+    <div class="w-full text-center pt-2 pb-6 flex justify-center">
         <a href="{{ route('home') }}" class="inline-block transition-transform hover:scale-105">
-            <h1 class="logo-text text-5xl sm:text-6xl font-black tracking-wide select-none">
-                PotretDiri
-            </h1>
+            <img src="{{ asset('images/logo-clean.png') }}" alt="Potret Diri" class="h-20 sm:h-24 w-auto drop-shadow-md">
         </a>
     </div>
 

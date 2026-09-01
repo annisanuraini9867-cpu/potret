@@ -21,9 +21,17 @@ class BookingTest extends TestCase
         $this->seed();
     }
 
-    public function test_home_page_shows_photo_packages(): void
+    public function test_splash_screen_opens_and_transitions_to_login(): void
     {
         $response = $this->get('/');
+        $response->assertStatus(200);
+        $response->assertSee('Potret Diri');
+        $response->assertSee('MEMUAT STUDIO');
+    }
+
+    public function test_home_page_shows_photo_packages(): void
+    {
+        $response = $this->get('/home');
         $response->assertStatus(200);
         $response->assertSee('Single Portrait');
         $response->assertSee('Potret Diri');
