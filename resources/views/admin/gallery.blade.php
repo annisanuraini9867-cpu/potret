@@ -7,7 +7,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h1 class="text-3xl font-black text-slate-900">Galeri Foto</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">Koleksi foto dikelompokkan secara rapi berdasarkan setiap sesi pemotretan</p>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Daftar sesi foto studio dalam kartu ringkas sejajar 5 kolom</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -60,93 +60,91 @@
         </div>
     </div>
 
-    <!-- Grouped Photos by Session -->
+    <!-- 5 Cards Across (Sejajar 5 Sesi Foto) -->
     @if(isset($sessions) && $sessions->count() > 0)
-        <div class="space-y-8">
-            @foreach($sessions as $session)
-            <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-100 space-y-5 transition hover:border-slate-200">
-                
-                <!-- Session Header Card -->
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-100">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-xl flex-shrink-0">
-                            📸
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-black text-slate-900 text-base">
-                                    {{ $session->customer_name ?? ($session->user ? $session->user->name : 'Pengunjung Kiosk') }}
-                                </h3>
-                                <span class="px-2.5 py-0.5 rounded-full bg-amber-100/70 text-amber-900 font-mono font-black text-[11px]">
-                                    {{ $session->booking_code }}
-                                </span>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400 mt-1">
-                                <span>📅 {{ $session->booking_date ? $session->booking_date->format('d M Y') : date('d M Y') }} ({{ substr($session->start_time ?? '00:00', 0, 5) }} WIB)</span>
-                                <span>•</span>
-                                <span class="text-slate-600 font-bold">Template: {{ ucwords(str_replace('-', ' ', $session->frame_design ?? 'Classic 4-Grid')) }}</span>
-                                <span>•</span>
-                                <span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md text-[10px]">{{ $session->photos->count() }} File Foto</span>
-                            </div>
-                        </div>
-                    </div>
+        <div class="space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-black uppercase tracking-wider text-slate-400">RIWAYAT SESI FOTO TERBARU</h3>
+                <span class="text-xs font-bold text-slate-500">Menampilkan 5 Sesi per Baris</span>
+            </div>
 
-                    <!-- Actions per Session -->
-                    <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-                        <a href="{{ route('gallery.show', $session->booking_code) }}" target="_blank" 
-                           class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center gap-1.5">
-                            <span>👁</span>
-                            <span>Lihat Galeri Sesi</span>
-                        </a>
-
-                        <a href="{{ route('gallery.downloadZip', $session->booking_code) }}" 
-                           class="px-3.5 py-2 rounded-xl bg-[#18181B] hover:bg-slate-800 text-white font-bold text-xs transition flex items-center gap-1.5">
-                            <span>⬇</span>
-                            <span>Unduh ZIP</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Photos in This Session Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pt-1">
-                    @foreach($session->photos as $photo)
-                    <div class="group relative rounded-2xl overflow-hidden bg-slate-100 border {{ $photo->is_collage ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-slate-200' }} aspect-[3/4] shadow-sm hover:shadow-md transition">
+            <!-- Grid 5 Kolom Sejajar (Responsive: 1 -> 2 -> 3 -> 5) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+                @foreach($sessions as $session)
+                @php
+                    $coverPhoto = $session->photos->firstWhere('is_collage', true) ?? $session->photos->first();
+                @endphp
+                <div class="bg-white rounded-3xl p-3.5 shadow-sm border border-slate-100 hover:border-amber-300 hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-3 group">
+                    
+                    <!-- Thumbnail Preview Card -->
+                    <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 cursor-pointer"
+                         onclick="openLightbox('{{ asset('storage/' . ($coverPhoto ? $coverPhoto->file_path : '')) }}', '{{ $session->customer_name ?? 'Sesi' }} ({{ $session->booking_code }})')">
                         
-                        <img src="{{ asset('storage/' . $photo->file_path) }}" 
-                             alt="{{ $photo->file_name }}" 
-                             onclick="openLightbox('{{ asset('storage/' . $photo->file_path) }}', '{{ $photo->file_name }}')"
-                             class="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-300">
-                        
-                        <!-- Collage / Single Badge -->
-                        @if($photo->is_collage)
-                            <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-[#F5BD23] text-slate-950 text-[9px] font-black shadow-md flex items-center gap-1">
-                                <span>⭐</span>
-                                <span>KOLASE CETAK</span>
-                            </div>
+                        @if($coverPhoto)
+                            <img src="{{ asset('storage/' . $coverPhoto->file_path) }}" 
+                                 alt="{{ $session->booking_code }}" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                         @else
-                            <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-white text-[9px] font-bold">
-                                {{ preg_match('/Slot-(\d+)/', $photo->file_name, $m) ? 'Pose #' . $m[1] : 'Foto' }}
+                            <div class="w-full h-full flex items-center justify-center text-3xl text-slate-300">
+                                📸
                             </div>
                         @endif
 
-                        <!-- Hover Overlay Download Button -->
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none group-hover:pointer-events-auto">
-                            <a href="{{ asset('storage/' . $photo->file_path) }}" download="{{ $photo->file_name }}" 
-                               class="p-2 rounded-xl bg-white text-slate-900 text-xs font-bold shadow hover:bg-slate-100 transition">
-                                ⬇ Simpan
-                            </a>
+                        <!-- Top Left: Photo Count Badge -->
+                        <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-lg bg-black/75 backdrop-blur-sm text-white text-[10px] font-black shadow flex items-center gap-1">
+                            <span>📷</span>
+                            <span>{{ $session->photos->count() }} Foto</span>
                         </div>
 
+                        <!-- Top Right: Template Badge -->
+                        <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-lg bg-[#F5BD23] text-slate-950 text-[9px] font-black shadow truncate max-w-[90px]">
+                            {{ ucwords(str_replace(['classic-', 'cinematic-', 'polaroid-', 'passport-'], '', $session->frame_design ?? 'Grid')) }}
+                        </div>
+
+                        <!-- Hover Icon Overlay -->
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                            <span class="w-10 h-10 rounded-full bg-white/90 text-slate-900 flex items-center justify-center text-sm shadow-lg font-bold">
+                                👁
+                            </span>
+                        </div>
                     </div>
-                    @endforeach
+
+                    <!-- Session Metadata -->
+                    <div class="space-y-1 px-1">
+                        <div class="font-black text-slate-900 text-xs truncate" title="{{ $session->customer_name ?? 'Pengunjung Kiosk' }}">
+                            {{ $session->customer_name ?? ($session->user ? $session->user->name : 'Pengunjung Kiosk') }}
+                        </div>
+                        <div class="font-mono text-[10px] font-bold text-amber-600 truncate">
+                            {{ $session->booking_code }}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-medium truncate">
+                            {{ $session->booking_date ? $session->booking_date->format('d M Y') : date('d M Y') }} • {{ substr($session->start_time ?? '00:00', 0, 5) }}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100 text-xs">
+                        <a href="{{ route('gallery.show', $session->booking_code) }}" target="_blank" 
+                           class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition flex items-center justify-center gap-1 text-center">
+                            <span>👁</span>
+                            <span>Buka</span>
+                        </a>
+
+                        <a href="{{ route('gallery.downloadZip', $session->booking_code) }}" 
+                           class="py-2 px-2 rounded-xl bg-[#18181B] hover:bg-slate-800 text-white font-bold text-[11px] transition flex items-center justify-center gap-1 text-center">
+                            <span>⬇</span>
+                            <span>ZIP</span>
+                        </a>
+                    </div>
+
                 </div>
-
+                @endforeach
             </div>
-            @endforeach
-        </div>
 
-        <div class="pt-4">
-            {{ $sessions->links() }}
+            <!-- Pagination Links -->
+            <div class="pt-4">
+                {{ $sessions->links() }}
+            </div>
         </div>
     @else
         <!-- Empty State Galeri -->
@@ -156,7 +154,7 @@
             </div>
             <div class="space-y-1">
                 <h3 class="text-base font-black text-slate-900">Belum Ada Sesi Foto Tersimpan</h3>
-                <p class="text-xs text-slate-400 max-w-sm mx-auto">Setiap sesi pemotretan dari layar kiosk akan otomatis membentuk grup album sesi tersendiri beserta foto kolase dan foto satuan.</p>
+                <p class="text-xs text-slate-400 max-w-sm mx-auto">Setiap sesi pemotretan dari layar kiosk akan otomatis membentuk 1 kartu album sesi ringkas di galeri ini.</p>
             </div>
             <div class="pt-2">
                 <a href="{{ route('booth.index') }}" target="_blank" 

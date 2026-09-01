@@ -145,7 +145,7 @@ class AdminDashboardController extends Controller
             });
         }
 
-        $sessions = $sessionQuery->latest('booking_date')->latest('start_time')->latest('id')->paginate(6);
+        $sessions = $sessionQuery->latest('booking_date')->latest('start_time')->latest('id')->paginate(10);
         $totalSessionsWithPhotos = Booking::has('photos')->count();
         $totalPhotosCount = Photo::count();
         
