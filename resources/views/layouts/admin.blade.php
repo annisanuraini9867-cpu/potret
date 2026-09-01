@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-[#E5E7EB]">
+<html lang="id" class="h-full bg-[#E5E7EB] overflow-hidden">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,12 +17,26 @@
             -webkit-text-stroke: 1.2px #1E293B;
             text-shadow: 2px 2px 0px #0F172A;
         }
+        /* Custom smooth scrollbar for main content */
+        main::-webkit-scrollbar {
+            width: 6px;
+        }
+        main::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        main::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        main::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
     </style>
 </head>
-<body class="min-h-full flex flex-col bg-[#E5E7EB] text-slate-800 antialiased selection:bg-[#F5BD23] selection:text-slate-900">
+<body class="h-full flex flex-col bg-[#E5E7EB] text-slate-800 antialiased selection:bg-[#F5BD23] selection:text-slate-900 overflow-hidden">
 
     <!-- Top Navigation Header -->
-    <header class="w-full bg-white border-b border-slate-200/80 px-6 py-3 flex justify-between items-center z-30 sticky top-0">
+    <header class="w-full h-16 bg-white border-b border-slate-200/80 px-6 py-3 flex justify-between items-center z-30 flex-shrink-0">
         <a href="{{ route('admin.dashboard') }}" class="inline-block transition-transform hover:scale-105">
             <h1 class="logo-text text-2xl sm:text-3xl font-black tracking-wide select-none">
                 Potret Diri
@@ -41,10 +55,10 @@
         </div>
     </header>
 
-    <div class="flex-1 flex w-full">
+    <div class="flex-1 flex w-full h-[calc(100vh-4rem)] overflow-hidden">
         
-        <!-- Left Sidebar Navigation (Exact Match across all 5 images) -->
-        <aside class="w-64 bg-white border-r border-slate-200/80 p-5 flex flex-col justify-between flex-shrink-0 min-h-[calc(100vh-61px)]">
+        <!-- Left Sidebar Navigation (Locked / Fixed / No Scroll) -->
+        <aside class="w-64 bg-white border-r border-slate-200/80 p-5 flex flex-col justify-between flex-shrink-0 h-full overflow-hidden select-none">
             <div class="space-y-6">
                 
                 <span class="text-[11px] font-black tracking-widest text-slate-400 uppercase block px-3">
