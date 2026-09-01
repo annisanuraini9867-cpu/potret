@@ -71,14 +71,14 @@
 </head>
 <body onclick="navigateToLogin()" class="h-full w-full flex flex-col items-center justify-center p-6 overflow-hidden cursor-pointer selection:bg-transparent">
 
-    <div id="splash-container" class="relative flex flex-col items-center justify-center w-full max-w-lg mx-auto text-center transition-all">
+    <div id="splash-container" class="relative flex flex-col items-center justify-center w-full max-w-2xl mx-auto text-center transition-all px-4">
         
-        <!-- Logo Image with Entrance & Floating Animation -->
-        <div class="w-full max-w-[360px] sm:max-w-[420px] aspect-[4/3] flex items-center justify-center animate-splash-pop">
-            <div class="animate-float w-full">
+        <!-- Logo Image with Entrance & Floating Animation (Zoomed In Size) -->
+        <div class="w-full max-w-[500px] sm:max-w-[620px] md:max-w-[720px] aspect-[4/3] flex items-center justify-center animate-splash-pop">
+            <div class="animate-float w-full flex items-center justify-center">
                 <img src="{{ asset('images/logo-clean.png') }}" 
                      alt="Potret Diri" 
-                     class="w-full h-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.18)]">
+                     class="w-full h-auto object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.22)] scale-110">
             </div>
         </div>
 
