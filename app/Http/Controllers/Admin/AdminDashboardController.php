@@ -126,12 +126,27 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * 3. Galeri Foto - Sesuai Gambar 3
+     * 3. Galeri Foto - Dikelompokkan Berdasarkan Sesi Foto (Booking)
      */
-    public function gallery()
+    public function gallery(Request $request)
     {
         $user = Auth::user();
-        $photos = Photo::with('booking')->latest()->paginate(16);
+
+        // Ambil sesi (Booking) yang memiliki foto, diurutkan dari yang terbaru
+        $sessionQuery = Booking::with(['photos' => function ($q) {
+            $q->orderByDesc('is_collage')->latest('id');
+        }, 'user', 'package'])->has('photos');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $sessionQuery->where(function ($q) use ($search) {
+                $q->where('booking_code', 'like', "%{$search}%")
+                  ->orWhere('customer_name', 'like', "%{$search}%");
+            });
+        }
+
+        $sessions = $sessionQuery->latest('booking_date')->latest('start_time')->latest('id')->paginate(6);
+        $totalSessionsWithPhotos = Booking::has('photos')->count();
         $totalPhotosCount = Photo::count();
         
         // Calculate real storage size in MB / GB
@@ -139,7 +154,14 @@ class AdminDashboardController extends Controller
         $usedStorageMB = round($totalBytes / (1024 * 1024), 2);
         $usedStorageGB = round($totalBytes / (1024 * 1024 * 1024), 2);
 
-        return view('admin.gallery', compact('user', 'photos', 'totalPhotosCount', 'usedStorageMB', 'usedStorageGB'));
+        return view('admin.gallery', compact(
+            'user', 
+            'sessions', 
+            'totalSessionsWithPhotos', 
+            'totalPhotosCount', 
+            'usedStorageMB', 
+            'usedStorageGB'
+        ));
     }
 
     /**

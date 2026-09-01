@@ -61,7 +61,7 @@ class AdminPanelTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Galeri Foto');
         $response->assertSee('KAPASITAS PENYIMPANAN CLOUD');
-        $response->assertSee('Total File');
+        $response->assertSee('Sesi');
     }
 
     public function test_admin_qris_settings_page_and_update(): void
