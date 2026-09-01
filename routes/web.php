@@ -57,6 +57,7 @@ Route::get('/booth/start/payment', [\App\Http\Controllers\BoothController::class
 Route::post('/booth/start/payment/confirm', [\App\Http\Controllers\BoothController::class, 'confirmPayment'])->name('booth.start.confirmPayment');
 Route::get('/booth/start/success', [\App\Http\Controllers\BoothController::class, 'paymentSuccess'])->name('booth.start.success');
 Route::post('/booth/search', [\App\Http\Controllers\BoothController::class, 'search'])->name('booth.search');
+Route::post('/booth/verify-admin-pin', [\App\Http\Controllers\BoothController::class, 'verifyAdminPin'])->name('booth.verify-admin-pin');
 Route::get('/booth/{booking_code}', [\App\Http\Controllers\BoothController::class, 'session'])->name('booth.session');
 Route::post('/booth/{booking_code}/save', [\App\Http\Controllers\BoothController::class, 'saveSession'])->name('booth.save');
 

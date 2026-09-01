@@ -477,4 +477,38 @@ class BoothController extends Controller
             'redirect_url' => route('gallery.show', $booking->booking_code),
         ]);
     }
+
+    /**
+     * Verifikasi PIN Admin dari Layar Kiosk Standby
+     */
+    public function verifyAdminPin(Request $request)
+    {
+        $request->validate([
+            'pin' => 'required|string|size:6',
+        ]);
+
+        $pin = $request->pin;
+
+        // Cari admin yang cocok dengan PIN ini
+        $admin = User::where('role', 'admin')->where('admin_pin', $pin)->first();
+
+        // Fallback jika default PIN 123456
+        if (!$admin && $pin === '123456') {
+            $admin = User::where('role', 'admin')->first();
+        }
+
+        if ($admin) {
+            \Illuminate\Support\Facades\Auth::login($admin);
+            return response()->json([
+                'success'      => true,
+                'message'      => 'PIN terverifikasi! Mengalihkan ke panel admin...',
+                'redirect_url' => route('admin.dashboard'),
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'PIN Admin salah. Silakan masukkan 6 digit PIN yang benar.',
+        ], 422);
+    }
 }
