@@ -23,11 +23,11 @@ class BoothFlowTest extends TestCase
     {
         $response = $this->get(route('booth.start.template'));
         $response->assertStatus(200);
-        $response->assertSee('Pilih Template Foto');
+        $response->assertSee('Pilih Template');
         $response->assertSee('Classic 4–Grid');
-        $response->assertSee('Cinematic Strip');
-        $response->assertSee('Polaroid Wide');
-        $response->assertSee('Passport Trio');
+        $response->assertSee('Cinematic 3–Strip');
+        $response->assertSee('Polaroid Nostalgia Wide');
+        $response->assertSee('Duo Bestie Split');
 
         $postResponse = $this->post(route('booth.start.postTemplate'), [
             'template_id' => 'cinematic-strip',

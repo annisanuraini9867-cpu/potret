@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informasi Studio - Potret Diri</title>
+    <title>Informasi Studio - POTRET</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,7 @@
     <header class="w-full max-w-5xl flex items-center justify-start py-2">
         <a href="{{ route('home') }}" class="inline-block transition-transform hover:scale-105">
             <h1 class="logo-text text-3xl sm:text-4xl font-black tracking-wide select-none">
-                Potret Diri
+                POTRET
             </h1>
         </a>
     </header>
@@ -67,7 +67,7 @@
         <div class="space-y-2 mb-8">
             <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Informasi Studio</h2>
             <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
-                Lengkapi detail studio Anda untuk mulai dikurasi di platform Potret Diri.
+                Lengkapi detail studio Anda untuk mulai dikurasi di platform POTRET.
             </p>
         </div>
 
@@ -89,9 +89,9 @@
                 <label for="studio_name" class="block text-xs font-bold text-slate-700">Nama Studio</label>
                 <input type="text" id="studio_name" name="studio_name" 
                        value="{{ old('studio_name', $saved['studio_name'] ?? '') }}" 
-                       placeholder="Contoh: Studio Cahaya Abadi" 
+                       placeholder="" 
                        required autofocus 
-                       class="w-full px-4 py-3.5 bg-slate-100/90 border border-transparent rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#F5BD23] focus:outline-none transition">
+                       class="w-full px-4 py-3.5 bg-slate-100/90 border border-transparent rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#F5BD23] focus:outline-none transition">
             </div>
 
             <!-- Alamat Lengkap -->
@@ -99,37 +99,30 @@
                 <label for="studio_address" class="block text-xs font-bold text-slate-700">Alamat Lengkap</label>
                 <input type="text" id="studio_address" name="studio_address" 
                        value="{{ old('studio_address', $saved['studio_address'] ?? '') }}" 
-                       placeholder="Jl. Senopati No. 123, Kebayoran Baru" 
+                       placeholder="" 
                        required 
-                       class="w-full px-4 py-3.5 bg-slate-100/90 border border-transparent rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#F5BD23] focus:outline-none transition">
+                       class="w-full px-4 py-3.5 bg-slate-100/90 border border-transparent rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#F5BD23] focus:outline-none transition">
             </div>
 
-            <!-- Kota -->
+            <!-- Nomor WhatsApp Pengelola / Hotline Studio (Pengganti Kota) -->
             <div class="space-y-2">
-                <label for="studio_city" class="block text-xs font-bold text-slate-700">Kota</label>
-                <input type="text" id="studio_city" name="studio_city" 
-                       value="{{ old('studio_city', $saved['studio_city'] ?? '') }}" 
-                       placeholder="Jakarta Selatan" 
-                       required 
-                       class="w-full px-4 py-3.5 bg-slate-100/90 border border-transparent rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#F5BD23] focus:outline-none transition">
-            </div>
-
-            <!-- Tipe Booth -->
-            <div class="space-y-2">
-                <label for="booth_type" class="block text-xs font-bold text-slate-700">Tipe Booth</label>
-                <div class="relative">
-                    <select id="booth_type" name="booth_type" required 
-                            class="w-full px-4 py-3.5 bg-slate-100/90 border border-transparent rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#F5BD23] focus:outline-none transition appearance-none cursor-pointer">
-                        <option value="" disabled {{ empty($saved['booth_type']) ? 'selected' : '' }}>Pilih tipe booth</option>
-                        <option value="Self-Photo Studio (Box Room)" {{ ($saved['booth_type'] ?? '') == 'Self-Photo Studio (Box Room)' ? 'selected' : '' }}>Self-Photo Studio (Box Room)</option>
-                        <option value="Photo Booth Kiosk (Touchscreen Event)" {{ ($saved['booth_type'] ?? '') == 'Photo Booth Kiosk (Touchscreen Event)' ? 'selected' : '' }}>Photo Booth Kiosk (Touchscreen Event)</option>
-                        <option value="Glamour & Portrait Studio" {{ ($saved['booth_type'] ?? '') == 'Glamour & Portrait Studio' ? 'selected' : '' }}>Glamour & Portrait Studio</option>
-                        <option value="360 Spin Video Booth" {{ ($saved['booth_type'] ?? '') == '360 Spin Video Booth' ? 'selected' : '' }}>360 Spin Video Booth</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-500">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
+                <div class="flex items-center justify-between">
+                    <label for="studio_phone" class="block text-xs font-bold text-slate-700">Nomor WhatsApp Pengelola / Hotline Studio</label>
+                    <span class="text-[10px] text-amber-800 font-bold bg-amber-100/80 px-2 py-0.5 rounded-md">
+                        Penting untuk Notifikasi & Alert
+                    </span>
                 </div>
+                <input type="tel" id="studio_phone" name="studio_phone" 
+                       value="{{ old('studio_phone', $saved['studio_phone'] ?? ($saved['phone'] ?? '')) }}" 
+                       placeholder="" 
+                       required 
+                       pattern="[0-9\+\-\s]+"
+                       title="Nomor WhatsApp hanya boleh berisi angka"
+                       oninput="this.value = this.value.replace(/[^0-9\+\-\s]/g, '')"
+                       class="w-full px-4 py-3.5 bg-slate-100/90 border border-transparent rounded-xl text-sm text-slate-800 focus:bg-white focus:border-[#F5BD23] focus:outline-none transition">
+                <p class="text-[11px] text-slate-400">
+                    Digunakan untuk notifikasi transaksi QRIS sukses, peringatan kertas/tinta printer habis, dan bantuan remote engineering.
+                </p>
             </div>
 
             <!-- Buttons Row -->

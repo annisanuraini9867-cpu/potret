@@ -87,7 +87,7 @@
             </div>
 
             <!-- Dynamic Payment Summary Pill (Exact Match to Image 2) -->
-            <div class="max-w-md mx-auto bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex items-center justify-between text-left">
+            <div class="max-w-md mx-auto bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
                 <div class="flex items-center gap-3.5">
                     <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
                         💵
@@ -98,7 +98,7 @@
                     </div>
                 </div>
 
-                <div class="text-right space-y-1">
+                <div class="text-left sm:text-right space-y-1">
                     <span class="text-[10px] font-bold text-slate-400 block">Metode: QRIS Dinamis</span>
                     <div class="flex items-center gap-1.5">
                         <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[9px]">GOPAY</span>
@@ -109,12 +109,12 @@
             </div>
 
             <!-- Bottom CTA Button (Exact Match) -->
-            <div class="pt-4 flex items-center justify-center gap-3">
-                <a href="{{ route('booth.start.template') }}" class="py-4 px-8 rounded-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-sm transition">
+            <div class="pt-4 flex flex-col-reverse sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto">
+                <a href="{{ route('booth.start.template') }}" class="w-full sm:w-auto py-3.5 sm:py-4 px-8 rounded-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-sm transition text-center">
                     Kembali
                 </a>
                 <button type="submit" 
-                        class="py-4 px-12 rounded-full bg-[#F5BD23] hover:bg-[#E5AC10] active:scale-95 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-amber-500/30 transition-all">
+                        class="w-full sm:w-auto py-3.5 sm:py-4 px-8 sm:px-12 rounded-full bg-[#F5BD23] hover:bg-[#E5AC10] active:scale-95 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-amber-500/30 transition-all text-center">
                     Lanjut ke Pembayaran →
                 </button>
             </div>

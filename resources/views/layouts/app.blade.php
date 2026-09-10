@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Potret Diri - Studio Self-Photo Booth Modern' }}</title>
+    <title>{{ $title ?? 'POTRET - Studio Self-Photo Booth Modern' }}</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,24 +38,29 @@
             <div class="flex justify-between items-center h-16 sm:h-20">
                 <!-- Brand Logo Image -->
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                    <img src="{{ asset('images/logo.png') }}" alt="Potret Diri Logo" class="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105">
+                    <img src="{{ asset('images/logo.png') }}" alt="POTRET Logo" class="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105">
                 </a>
 
                 <!-- Nav links -->
-                <nav class="hidden md:flex items-center gap-7 text-sm font-bold text-slate-600">
+                <nav class="hidden md:flex items-center gap-6 text-sm font-bold text-slate-600">
                     <a href="{{ route('home') }}" class="hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('home') ? 'text-[#1D4ED8]' : '' }}">Beranda</a>
-                    <a href="{{ route('bookings.create') }}" class="hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('bookings.create') ? 'text-[#1D4ED8]' : '' }}">Pesan Jadwal</a>
-                    <a href="{{ route('booth.index') }}" class="px-3.5 py-1.5 rounded-full bg-[#F5BD23]/20 text-slate-900 hover:bg-[#F5BD23] transition-all font-black flex items-center gap-1.5">
-                        <span>📸 Photo Booth Kiosk</span>
+                    <a href="{{ route('home') }}#fitur" class="hover:text-[#1D4ED8] transition-colors">Fitur Software</a>
+                    <a href="{{ route('home') }}#harga" class="hover:text-[#1D4ED8] transition-colors flex items-center gap-1.5">
+                        <span>Harga Paket</span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-black bg-rose-500 text-white uppercase tracking-wider animate-pulse">Promo</span>
                     </a>
-                    <a href="{{ route('gallery.index') }}" class="hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('gallery.*') ? 'text-[#1D4ED8]' : '' }}">Ambil Foto</a>
+                    <a href="{{ route('home') }}#kalkulator" class="hover:text-[#1D4ED8] transition-colors">Simulasi Cuan</a>
+                    <a href="{{ route('booth.index') }}" class="px-3.5 py-1.5 rounded-full bg-slate-900 text-[#F5BD23] hover:bg-slate-800 transition-all font-black flex items-center gap-1.5 text-xs shadow-sm">
+                        <span>📸 Demo Kiosk</span>
+                    </a>
+                    <a href="{{ route('gallery.index') }}" class="hover:text-[#1D4ED8] transition-colors {{ request()->routeIs('gallery.*') ? 'text-[#1D4ED8]' : '' }} text-xs font-semibold text-slate-500">Unduh Foto</a>
                 </nav>
 
-                <!-- Auth Buttons -->
-                <div class="flex items-center gap-3">
+                <!-- Auth Buttons & Mobile Menu Button -->
+                <div class="flex items-center gap-2 sm:gap-3">
                     @auth
                         @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow transition">
+                            <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow transition">
                                 <span>👤 Konsol Admin</span>
                             </a>
                         @else
@@ -66,12 +71,44 @@
                             <button type="submit" class="text-xs font-semibold text-slate-500 hover:text-rose-600 transition">Keluar</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="text-xs font-extrabold text-slate-700 hover:text-[#1D4ED8] px-3 py-2">Masuk</a>
-                        <a href="{{ route('bookings.create') }}" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-[#F5BD23] hover:bg-[#E5AC10] text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition-all hover:scale-105">
-                            Pesan Sesi Foto
+                        <a href="{{ route('login') }}" class="text-xs font-extrabold text-slate-700 hover:text-[#1D4ED8] px-2.5 sm:px-3 py-2">Masuk</a>
+                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#F5BD23] hover:bg-[#E5AC10] text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition-all hover:scale-105">
+                            <span class="hidden sm:inline">✨ Mulai Berlangganan</span>
+                            <span class="sm:hidden">✨ Coba Gratis</span>
                         </a>
                     @endauth
+
+                    <!-- Mobile Hamburger Toggle Button -->
+                    <button type="button" 
+                            id="app-mobile-menu-btn"
+                            onclick="toggleAppMobileMenu()" 
+                            class="md:hidden p-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition active:scale-95 ml-1"
+                            aria-label="Menu Utama">
+                        <svg id="app-menu-icon-open" class="w-5 h-5 block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="app-menu-icon-close" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
+            </div>
+
+            <!-- Mobile Menu Dropdown -->
+            <div id="app-mobile-menu" class="hidden md:hidden border-t border-slate-100 py-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                <nav class="flex flex-col space-y-1 text-xs font-bold text-slate-700">
+                    <a href="{{ route('home') }}" class="px-3 py-2 rounded-xl hover:bg-slate-100 transition {{ request()->routeIs('home') ? 'text-[#1D4ED8] bg-blue-50' : '' }}">Beranda</a>
+                    <a href="{{ route('home') }}#fitur" onclick="toggleAppMobileMenu()" class="px-3 py-2 rounded-xl hover:bg-slate-100 transition">Fitur Software</a>
+                    <a href="{{ route('home') }}#harga" onclick="toggleAppMobileMenu()" class="px-3 py-2 rounded-xl hover:bg-slate-100 transition flex items-center justify-between">
+                        <span>Harga Paket</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-500 text-white uppercase tracking-wider">Promo 40%</span>
+                    </a>
+                    <a href="{{ route('home') }}#kalkulator" onclick="toggleAppMobileMenu()" class="px-3 py-2 rounded-xl hover:bg-slate-100 transition">Simulasi Cuan</a>
+                    <a href="{{ route('booth.index') }}" class="px-3 py-2.5 rounded-xl bg-slate-900 text-[#F5BD23] font-black flex items-center gap-2 text-xs shadow-sm">
+                        <span>📸 Buka Demo Kiosk</span>
+                    </a>
+                    <a href="{{ route('gallery.index') }}" class="px-3 py-2 rounded-xl hover:bg-slate-100 transition text-slate-500">Unduh Foto Hasil Sesi</a>
+                </nav>
             </div>
         </div>
     </header>
@@ -115,19 +152,44 @@
 
     <!-- Footer Copyright -->
     <footer class="bg-white border-t border-slate-200 mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-6 w-auto">
-                <span class="font-medium">&copy; {{ date('Y') }} PotretDiri BY. Caboo. All rights reserved.</span>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-slate-500">
+            <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-7 w-auto">
+                <div>
+                    <p class="font-bold text-slate-800">POTRET - Software Self-Photo Booth Kiosk #1 di Indonesia</p>
+                    <p class="font-medium text-slate-400">&copy; {{ date('Y') }} POTRET BY. Caboo. All rights reserved.</p>
+                </div>
             </div>
-            <div class="flex gap-4 font-semibold">
+            <div class="flex flex-wrap justify-center gap-4 sm:gap-6 font-semibold">
                 <a href="{{ route('home') }}" class="hover:underline">Beranda</a>
-                <a href="{{ route('bookings.create') }}" class="hover:underline">Pemesanan</a>
-                <a href="{{ route('booth.index') }}" class="hover:underline text-amber-600">Photo Booth Kiosk</a>
+                <a href="{{ route('home') }}#fitur" class="hover:underline">Fitur Software</a>
+                <a href="{{ route('home') }}#harga" class="hover:underline text-rose-600 font-bold">Harga Paket</a>
+                <a href="{{ route('home') }}#kalkulator" class="hover:underline">Kalkulator ROI</a>
+                <a href="{{ route('booth.index') }}" class="hover:underline text-amber-600 font-bold">Demo Kiosk</a>
                 <a href="{{ route('gallery.index') }}" class="hover:underline">Ambil Foto</a>
-                <a href="{{ route('login') }}" class="hover:underline">Konsol Admin</a>
+                <a href="{{ route('login') }}" class="hover:underline">Masuk Admin</a>
+                <a href="{{ route('register') }}" class="hover:underline text-blue-600 font-bold">Daftar Studio</a>
             </div>
         </div>
     </footer>
+
+    <script>
+        function toggleAppMobileMenu() {
+            const menu = document.getElementById('app-mobile-menu');
+            const iconOpen = document.getElementById('app-menu-icon-open');
+            const iconClose = document.getElementById('app-menu-icon-close');
+            if (!menu) return;
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                if (iconOpen) iconOpen.classList.add('hidden');
+                if (iconClose) iconClose.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+                if (iconOpen) iconOpen.classList.remove('hidden');
+                if (iconClose) iconClose.classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 </html>

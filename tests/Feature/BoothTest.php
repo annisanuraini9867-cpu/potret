@@ -67,13 +67,39 @@ class BoothTest extends TestCase
         $response = $this->get(route('booth.session', $booking->booking_code));
         $response->assertStatus(200);
 
-        // Verifikasi elemen Preview & Print Station muncul di halaman
-        $response->assertSee('Original Photos');
-        $response->assertSee('Frame Preview');
-        $response->assertSee('GIF Preview');
-        $response->assertSee('Print Photo');
-        $response->assertSee('Download Digital');
-        $response->assertSee('Finish Session');
+        // Verifikasi elemen Preview, Print Station, serta Timer Sesi muncul di halaman
+        $response->assertSee('Print Layout');
+        $response->assertSee('Foto Satuan');
+        $response->assertSee('Animasi GIF');
+        $response->assertSee('Cetak Foto (Print)');
+        $response->assertSee('SELESAI SESI');
+        $response->assertSee('Sisa Waktu:');
+        $response->assertSee('Durasi Studio:');
+    }
+
+    public function test_booth_session_timer_reflects_admin_duration_setting(): void
+    {
+        \App\Models\StudioSetting::set('session_duration', 15);
+        \App\Models\StudioSetting::set('retake_limit', '3');
+
+        $package = Package::first();
+        $booking = Booking::create([
+            'customer_name'  => 'Luna Maya',
+            'customer_email' => 'luna@example.com',
+            'customer_phone' => '0812345678',
+            'package_id'     => $package->id,
+            'booking_date'   => date('Y-m-d'),
+            'start_time'     => '18:00:00',
+            'end_time'       => '18:30:00',
+            'status'         => 'confirmed',
+            'total_amount'   => $package->price,
+        ]);
+
+        $response = $this->get(route('booth.session', $booking->booking_code));
+        $response->assertStatus(200);
+        $response->assertSee('15 Menit');
+        $response->assertSee('15:00');
+        $response->assertSee('Maks 3x');
     }
 
     public function test_save_booth_session_stores_six_photos_and_one_composite_collage(): void

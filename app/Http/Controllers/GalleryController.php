@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Photo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 class GalleryController extends Controller
@@ -75,5 +77,49 @@ class GalleryController extends Controller
         }
 
         return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Menghapus satu file foto tertentu dari galeri sesi
+     */
+    public function destroyPhoto(string $booking_code, Photo $photo)
+    {
+        $booking = Booking::where('booking_code', $booking_code)->firstOrFail();
+
+        // Validasi kepemilikan foto
+        if ($photo->booking_id !== $booking->id) {
+            return back()->with('error', 'Foto ini tidak termasuk dalam sesi foto yang valid.');
+        }
+
+        if (Storage::disk('public')->exists($photo->file_path)) {
+            Storage::disk('public')->delete($photo->file_path);
+        }
+
+        $photo->delete();
+
+        return back()->with('success', 'Foto berhasil dihapus dari galeri sesi.');
+    }
+
+    /**
+     * Menghapus semua file foto pada sesi galeri
+     */
+    public function destroyAllPhotos(string $booking_code)
+    {
+        $booking = Booking::with('photos')->where('booking_code', $booking_code)->firstOrFail();
+
+        if ($booking->photos->isEmpty()) {
+            return back()->with('error', 'Belum ada foto yang tersedia untuk dihapus pada sesi ini.');
+        }
+
+        $count = $booking->photos->count();
+
+        foreach ($booking->photos as $photo) {
+            if (Storage::disk('public')->exists($photo->file_path)) {
+                Storage::disk('public')->delete($photo->file_path);
+            }
+            $photo->delete();
+        }
+
+        return back()->with('success', "Seluruh {$count} foto pada sesi {$booking->booking_code} berhasil dihapus.");
     }
 }

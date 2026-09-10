@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metode Pembayaran - Potret Diri</title>
+    <title>Metode Pembayaran - POTRET</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,7 @@
     <header class="w-full max-w-5xl flex items-center justify-start py-2">
         <a href="{{ route('home') }}" class="inline-block transition-transform hover:scale-105">
             <h1 class="logo-text text-3xl sm:text-4xl font-black tracking-wide select-none">
-                Potret Diri
+                POTRET
             </h1>
         </a>
     </header>
@@ -144,7 +144,10 @@
             <div class="space-y-3 pt-3 border-t border-slate-100 text-xs">
                 <div class="flex justify-between items-center text-slate-600">
                     <div>
-                        <span class="text-[10px] uppercase font-bold text-slate-400 block">PAKET TERPILIH</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">PAKET TERPILIH</span>
+                            <a href="{{ route('register') }}" class="text-[10px] text-blue-600 font-bold hover:underline">Ubah</a>
+                        </div>
                         <span class="font-extrabold text-slate-800 text-xs">{{ $packageName }}</span>
                     </div>
                     <span class="font-black text-slate-900 text-sm">Rp {{ number_format($packagePrice, 0, ',', '.') }}</span>

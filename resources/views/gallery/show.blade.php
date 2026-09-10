@@ -2,6 +2,27 @@
 
 @section('content')
 <div class="space-y-8">
+    <!-- Alert Notifikasi -->
+    @if(session('success'))
+    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-2">
+            <span>✅</span>
+            <span>{{ session('success') }}</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 text-base font-bold">&times;</button>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{{ session('error') }}</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-900 text-base font-bold">&times;</button>
+    </div>
+    @endif
+
     <!-- Header Galeri -->
     <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div class="space-y-2">
@@ -17,7 +38,7 @@
         </div>
 
         @if($booking->photos->isNotEmpty())
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <a href="{{ route('booth.session', $booking->booking_code) }}" class="inline-flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow transition">
                 <span>📸 Sesi Foto Ulang</span>
             </a>
@@ -25,6 +46,14 @@
                 <span>📦 Unduh Semua (ZIP)</span>
                 <span class="text-[10px] bg-emerald-800 px-2 py-0.5 rounded-full">{{ $booking->photos->count() }} Foto</span>
             </a>
+            <form action="{{ route('gallery.photos.destroyAll', $booking->booking_code) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus SELURUH foto (termasuk kolase) pada sesi {{ $booking->booking_code }}? Tindakan ini permanen!')" class="inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 font-bold text-xs border border-rose-200 shadow-sm transition">
+                    <span>🗑</span>
+                    <span>Hapus Semua Foto</span>
+                </button>
+            </form>
         </div>
         @endif
     </div>
@@ -42,11 +71,11 @@
         </div>
         <div class="flex-1 space-y-4 text-center md:text-left">
             <span class="px-3 py-1 rounded-full bg-rose-500 text-white text-xs font-black uppercase tracking-wider">
-                ⭐ Hasil Cetak Kolase 6 Foto
+                ⭐ Hasil Cetak Kolase ({{ $individualPhotos->count() }} Foto)
             </span>
             <h2 class="text-2xl sm:text-3xl font-black">Bingkai Kolase Pilihan Anda</h2>
             <p class="text-xs sm:text-sm text-indigo-200 leading-relaxed">
-                Ini adalah karya kolase 6 foto beresolusi tinggi yang digabungkan ke dalam bingkai pilihan Anda saat sesi Photo Booth. Siap untuk dicetak ukuran 4R atau dibagikan ke media sosial!
+                Ini adalah karya kolase {{ $individualPhotos->count() }} foto beresolusi tinggi yang digabungkan ke dalam bingkai pilihan Anda saat sesi Photo Booth. Siap untuk dicetak ukuran 4R atau dibagikan ke media sosial!
             </p>
             <div class="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
                 <a href="{{ $collage->url }}" download="{{ $collage->file_name }}" class="px-5 py-3 rounded-xl bg-white text-slate-900 font-extrabold text-xs shadow hover:bg-slate-100 transition flex items-center gap-2">
@@ -55,6 +84,14 @@
                 <a href="{{ $collage->url }}" target="_blank" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs backdrop-blur border border-white/20 transition">
                     🔍 Lihat Ukuran Penuh
                 </a>
+                <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $collage->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus bingkai kolase ini?')" class="inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-5 py-3 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white font-bold text-xs backdrop-blur border border-rose-400/30 transition flex items-center gap-1.5 shadow">
+                        <span>🗑</span>
+                        <span>Hapus Kolase</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -69,19 +106,43 @@
             </h3>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 @foreach($individualPhotos as $index => $photo)
-                <div class="group relative bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 aspect-square flex flex-col">
-                    <img src="{{ $photo->url }}" alt="{{ $photo->file_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                    
-                    <!-- Overlay on hover -->
-                    <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
-                        <span class="text-[11px] font-bold text-white/80">Slot #{{ $loop->iteration }}</span>
-                        <div class="flex items-center justify-center gap-2">
-                            <a href="{{ $photo->url }}" download="{{ $photo->file_name }}" class="px-2.5 py-1 rounded-lg bg-white text-slate-900 font-bold text-xs shadow hover:bg-slate-100 transition">
-                                ⬇ Unduh
-                            </a>
-                            <a href="{{ $photo->url }}" target="_blank" class="px-2 py-1 rounded-lg bg-white/20 text-white text-xs backdrop-blur-sm hover:bg-white/30 transition">
-                                🔍
-                            </a>
+                <div class="group relative bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+                    <div class="aspect-square relative overflow-hidden bg-slate-100">
+                        <img src="{{ $photo->url }}" alt="{{ $photo->file_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        
+                        <!-- Overlay on hover (Desktop) -->
+                        <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-white/90">Slot #{{ $loop->iteration }}</span>
+                                <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $photo->id]) }}" method="POST" onsubmit="return confirm('Hapus foto Slot #{{ $loop->iteration }} ini dari galeri?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs shadow transition flex items-center justify-center" title="Hapus Foto">
+                                        🗑
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{{ $photo->url }}" download="{{ $photo->file_name }}" class="px-2.5 py-1 rounded-lg bg-white text-slate-900 font-bold text-xs shadow hover:bg-slate-100 transition">
+                                    ⬇ Unduh
+                                </a>
+                                <a href="{{ $photo->url }}" target="_blank" class="px-2 py-1 rounded-lg bg-white/20 text-white text-xs backdrop-blur-sm hover:bg-white/30 transition">
+                                    🔍
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Bottom Bar (Touch-friendly) -->
+                    <div class="p-2 bg-white flex items-center justify-between border-t border-slate-100 text-xs sm:hidden">
+                        <span class="font-bold text-slate-700 text-[11px]">Slot #{{ $loop->iteration }}</span>
+                        <div class="flex items-center gap-1.5">
+                            <a href="{{ $photo->url }}" download="{{ $photo->file_name }}" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold">⬇</a>
+                            <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $photo->id]) }}" method="POST" onsubmit="return confirm('Hapus foto ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-700 text-[10px] font-bold">🗑</button>
+                            </form>
                         </div>
                     </div>
                 </div>

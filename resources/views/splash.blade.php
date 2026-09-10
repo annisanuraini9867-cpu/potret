@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Potret Diri - Self-Photo Booth App</title>
+    <title>POTRET - Self-Photo Booth App</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,7 +77,7 @@
         <div class="w-full max-w-[500px] sm:max-w-[620px] md:max-w-[720px] aspect-[4/3] flex items-center justify-center animate-splash-pop">
             <div class="animate-float w-full flex items-center justify-center">
                 <img src="{{ asset('images/logo-clean.png') }}" 
-                     alt="Potret Diri" 
+                     alt="POTRET" 
                      class="w-full h-auto object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.22)] scale-110">
             </div>
         </div>

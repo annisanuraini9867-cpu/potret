@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Potret Diri - Kiosk Photo Booth</title>
+    <title>POTRET - Kiosk Photo Booth</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,7 +50,7 @@
         
         <!-- Exact Artwork Background Image (Pixel-Perfect Match) -->
         <img src="{{ asset('images/kiosk-exact.png') }}" 
-             alt="Potret Diri Photo Booth Kiosk" 
+             alt="POTRET Photo Booth Kiosk" 
              class="w-full h-full object-contain pointer-events-none drop-shadow-2xl">
 
         <!-- ======================================================== -->
@@ -113,7 +113,7 @@
     <!-- INTERACTIVE ADMIN PIN MODAL POPUP                        -->
     <!-- ======================================================== -->
     <div id="admin-pin-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-        <div id="pin-card" class="bg-[#18181B] rounded-3xl border border-white/20 p-6 sm:p-8 max-w-sm w-full shadow-2xl space-y-5 text-center relative animate-in zoom-in duration-200">
+        <div id="pin-card" class="bg-[#18181B] rounded-3xl border border-white/20 p-6 sm:p-8 max-w-sm w-full shadow-2xl space-y-5 text-center relative animate-in zoom-in duration-200 max-h-[92vh] overflow-y-auto">
             
             <button type="button" onclick="closeAdminPinModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full text-lg leading-none">
                 ✕
@@ -172,7 +172,7 @@
     <!-- INTERACTIVE UNLOCK / START MODAL POPUP                   -->
     <!-- ======================================================== -->
     <div id="start-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-[#18181B] rounded-3xl border border-white/20 p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 text-center relative animate-in fade-in zoom-in duration-200">
+        <div class="bg-[#18181B] rounded-3xl border border-white/20 p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 text-center relative animate-in fade-in zoom-in duration-200 max-h-[92vh] overflow-y-auto">
             
             <button type="button" onclick="closeStartModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full text-lg">
                 ✕

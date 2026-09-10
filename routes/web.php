@@ -66,6 +66,8 @@ Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index
 Route::post('/gallery/search', [GalleryController::class, 'search'])->name('gallery.search');
 Route::get('/gallery/{booking_code}', [GalleryController::class, 'show'])->name('gallery.show');
 Route::get('/gallery/{booking_code}/download-zip', [GalleryController::class, 'downloadZip'])->name('gallery.downloadZip');
+Route::delete('/gallery/{booking_code}/photos/{photo}', [GalleryController::class, 'destroyPhoto'])->name('gallery.photos.destroy');
+Route::delete('/gallery/{booking_code}/photos', [GalleryController::class, 'destroyAllPhotos'])->name('gallery.photos.destroyAll');
 
 // --- PANEL ADMINISTRATOR (Auth + Role Admin) ---
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -79,6 +81,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/qris', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'qris'])->name('qris');
     Route::post('/qris', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateQris'])->name('qris.update');
     Route::get('/templates', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'templates'])->name('templates');
+    Route::post('/templates/default', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'setDefaultTemplate'])->name('templates.setDefault');
+    Route::post('/templates/upload', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'uploadTemplate'])->name('templates.upload');
     Route::get('/status', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'status'])->name('status');
 
     // Manajemen Reservasi

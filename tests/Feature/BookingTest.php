@@ -25,7 +25,7 @@ class BookingTest extends TestCase
     {
         $response = $this->get('/');
         $response->assertStatus(200);
-        $response->assertSee('Potret Diri');
+        $response->assertSee('POTRET');
         $response->assertSee('MEMUAT STUDIO');
     }
 
@@ -33,8 +33,8 @@ class BookingTest extends TestCase
     {
         $response = $this->get('/home');
         $response->assertStatus(200);
-        $response->assertSee('Single Portrait');
-        $response->assertSee('Potret Diri');
+        $response->assertSee('Starter Booth');
+        $response->assertSee('POTRET');
     }
 
     public function test_customer_can_create_a_booking_successfully(): void

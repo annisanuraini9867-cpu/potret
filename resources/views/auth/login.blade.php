@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - PotretDiri</title>
+    <title>Sign In - POTRET</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,17 +21,17 @@
 </head>
 <body class="min-h-full flex flex-col justify-between items-center py-10 px-4 antialiased selection:bg-[#F5BD23] selection:text-slate-900">
 
-    <!-- Top Logo Title (Teks Tulisan Potret Diri) -->
+    <!-- Top Logo Title (Teks Tulisan POTRET) -->
     <div class="w-full text-center pt-2 pb-6">
         <a href="{{ route('home') }}" class="inline-block transition-transform hover:scale-105">
             <h1 class="logo-text text-5xl sm:text-6xl font-black tracking-wide select-none">
-                Potret Diri
+                POTRET
             </h1>
         </a>
     </div>
 
     <!-- Login Card Container -->
-    <div class="w-full max-w-lg bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100">
+    <div class="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-10 md:p-12 shadow-sm border border-slate-100">
         
         <!-- Alerts if any -->
         @if(session('error'))

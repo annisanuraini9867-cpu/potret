@@ -3,6 +3,27 @@
 @section('content')
 <div class="space-y-8">
 
+    <!-- Alert Notifikasi -->
+    @if(session('success'))
+    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-2">
+            <span>✅</span>
+            <span>{{ session('success') }}</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 text-base font-bold">&times;</button>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{{ session('error') }}</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-900 text-base font-bold">&times;</button>
+    </div>
+    @endif
+
     <!-- Top Header & Actions -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -123,18 +144,27 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100 text-xs">
+                    <div class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-100 text-xs">
                         <a href="{{ route('gallery.show', $session->booking_code) }}" target="_blank" 
-                           class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition flex items-center justify-center gap-1 text-center">
+                           class="py-2 px-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[10px] transition flex items-center justify-center gap-1 text-center" title="Buka Galeri Pelanggan">
                             <span>👁</span>
                             <span>Buka</span>
                         </a>
 
                         <a href="{{ route('gallery.downloadZip', $session->booking_code) }}" 
-                           class="py-2 px-2 rounded-xl bg-[#18181B] hover:bg-slate-800 text-white font-bold text-[11px] transition flex items-center justify-center gap-1 text-center">
+                           class="py-2 px-1 rounded-xl bg-[#18181B] hover:bg-slate-800 text-white font-bold text-[10px] transition flex items-center justify-center gap-1 text-center" title="Unduh File ZIP">
                             <span>⬇</span>
                             <span>ZIP</span>
                         </a>
+
+                        <form action="{{ route('gallery.photos.destroyAll', $session->booking_code) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus seluruh foto sesi {{ $session->booking_code }}?')" class="w-full">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full py-2 px-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px] transition flex items-center justify-center gap-1 text-center" title="Hapus Seluruh Foto Sesi Ini">
+                                <span>🗑</span>
+                                <span>Hapus</span>
+                            </button>
+                        </form>
                     </div>
 
                 </div>

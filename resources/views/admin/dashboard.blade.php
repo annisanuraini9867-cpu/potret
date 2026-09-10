@@ -10,13 +10,13 @@
             <p class="text-xs sm:text-sm text-slate-500 mt-1">Pantau aktivitas harian dan status perangkat Anda secara real-time</p>
         </div>
 
-        <div class="flex items-center gap-3">
-            <a href="{{ route('booth.index') }}" target="_blank" class="px-4 py-2.5 rounded-full bg-[#F5BD23] hover:bg-[#E5AC10] active:scale-95 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition flex items-center gap-1.5">
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+            <a href="{{ route('booth.index') }}" target="_blank" class="flex-1 sm:flex-none justify-center px-4 py-2.5 rounded-full bg-[#F5BD23] hover:bg-[#E5AC10] active:scale-95 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition flex items-center gap-1.5">
                 <span>📸</span>
                 <span>+ Mulai Sesi Kiosk</span>
             </a>
 
-            <button type="button" onclick="refreshRealtimeStats()" class="px-4 py-2.5 rounded-full bg-[#18181B] hover:bg-slate-800 text-white font-bold text-xs shadow transition flex items-center gap-1.5">
+            <button type="button" onclick="refreshRealtimeStats()" class="flex-1 sm:flex-none justify-center px-4 py-2.5 rounded-full bg-[#18181B] hover:bg-slate-800 text-white font-bold text-xs shadow transition flex items-center gap-1.5">
                 <span id="refresh-spinner" class="inline-block">🔄</span>
                 <span>Update Data</span>
             </button>

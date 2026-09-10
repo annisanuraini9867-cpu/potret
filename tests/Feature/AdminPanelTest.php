@@ -90,9 +90,9 @@ class AdminPanelTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Kelola Template');
         $response->assertSee('Classic 4–Grid');
-        $response->assertSee('Cinematic Strip');
-        $response->assertSee('Polaroid Wide');
-        $response->assertSee('Passport Trio');
+        $response->assertSee('Cinematic 3–Strip');
+        $response->assertSee('Polaroid Nostalgia Wide');
+        $response->assertSee('Duo Bestie Split');
     }
 
     public function test_admin_status_page_can_be_rendered(): void

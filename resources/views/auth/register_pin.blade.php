@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buat PIN Admin - Potret Diri</title>
+    <title>Buat PIN Admin - POTRET</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,7 @@
     <header class="w-full max-w-5xl flex items-center justify-start py-2">
         <a href="{{ route('home') }}" class="inline-block transition-transform hover:scale-105">
             <h1 class="logo-text text-3xl sm:text-4xl font-black tracking-wide select-none">
-                Potret Diri
+                POTRET
             </h1>
         </a>
     </header>

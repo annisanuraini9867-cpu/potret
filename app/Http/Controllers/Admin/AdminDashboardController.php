@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Photo;
 use App\Models\Package;
+use App\Models\StudioSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminDashboardController extends Controller
 {
@@ -32,7 +34,7 @@ class AdminDashboardController extends Controller
             ->take(10)
             ->get();
 
-        $kioskStatus = cache('kiosk_status', session('kiosk_status', 'buka'));
+        $kioskStatus = StudioSetting::get('kiosk_status', cache('kiosk_status', session('kiosk_status', 'buka')));
 
         return view('admin.dashboard', compact(
             'user',
@@ -55,7 +57,7 @@ class AdminDashboardController extends Controller
 
         $totalSessions = Booking::count();
         $totalPrints = Photo::count();
-        $kioskStatus = cache('kiosk_status', session('kiosk_status', 'buka'));
+        $kioskStatus = StudioSetting::get('kiosk_status', cache('kiosk_status', session('kiosk_status', 'buka')));
 
         return response()->json([
             'today_earnings' => $todayEarnings,
@@ -78,6 +80,7 @@ class AdminDashboardController extends Controller
         ]);
 
         $status = $request->input('status');
+        StudioSetting::set('kiosk_status', $status);
         cache(['kiosk_status' => $status], now()->addDays(30));
         session(['kiosk_status' => $status]);
 
@@ -94,9 +97,9 @@ class AdminDashboardController extends Controller
     public function sessionControl()
     {
         $user = Auth::user();
-        $selectedDuration = session('studio_session_duration', 5);
-        $retakeEnabled = session('studio_retake_enabled', true);
-        $retakeLimit = session('studio_retake_limit', 'unlimited');
+        $selectedDuration = (int) StudioSetting::get('session_duration', session('studio_session_duration', 5));
+        $retakeEnabled = (bool)(int) StudioSetting::get('retake_enabled', session('studio_retake_enabled', 1));
+        $retakeLimit = (string) StudioSetting::get('retake_limit', session('studio_retake_limit', 'unlimited'));
 
         $recentActivities = Booking::with(['user', 'package'])->latest()->take(6)->get();
 
@@ -116,13 +119,21 @@ class AdminDashboardController extends Controller
             'retake_limit' => 'required|string',
         ]);
 
+        $duration = (int) $request->duration;
+        $retakeEnabled = $request->has('retake_enabled') ? '1' : '0';
+        $retakeLimit = (string) $request->retake_limit;
+
+        StudioSetting::set('session_duration', $duration);
+        StudioSetting::set('retake_enabled', $retakeEnabled);
+        StudioSetting::set('retake_limit', $retakeLimit);
+
         session([
-            'studio_session_duration' => $request->duration,
-            'studio_retake_enabled'   => $request->has('retake_enabled'),
-            'studio_retake_limit'     => $request->retake_limit,
+            'studio_session_duration' => $duration,
+            'studio_retake_enabled'   => (bool)(int)$retakeEnabled,
+            'studio_retake_limit'     => $retakeLimit,
         ]);
 
-        return back()->with('success', 'Pengaturan sesi studio berhasil diperbarui!');
+        return back()->with('success', 'Pengaturan sesi studio berhasil disimpan secara permanen!');
     }
 
     /**
@@ -170,10 +181,10 @@ class AdminDashboardController extends Controller
     public function qris()
     {
         $user = Auth::user();
-        $paymentGateway = session('qris_gateway', 'Gopay Merchant');
-        $merchantId = session('qris_merchant_id', 'MID-92834012');
-        $pricePerPrint = session('qris_price_per_print', 20000);
-        $selectedPackageCount = session('qris_package_count', 1);
+        $paymentGateway = StudioSetting::get('qris_gateway', session('qris_gateway', 'Gopay Merchant'));
+        $merchantId = StudioSetting::get('qris_merchant_id', session('qris_merchant_id', 'MID-92834012'));
+        $pricePerPrint = (int) StudioSetting::get('qris_price_per_print', session('qris_price_per_print', 20000));
+        $selectedPackageCount = (int) StudioSetting::get('qris_package_count', session('qris_package_count', 1));
 
         $totalQrisTxn = Booking::where('status', 'completed')->where('total_amount', '>', 0)->count();
         $totalQrisVolume = Booking::where('status', 'completed')->where('total_amount', '>', 0)->sum('total_amount');
@@ -194,8 +205,13 @@ class AdminDashboardController extends Controller
         $request->validate([
             'payment_gateway' => 'required|string',
             'merchant_id'     => 'required|string',
-            'price_per_print' => 'required|numeric',
+            'price_per_print' => 'required|numeric|min:0',
         ]);
+
+        StudioSetting::set('qris_gateway', $request->payment_gateway);
+        StudioSetting::set('qris_merchant_id', $request->merchant_id);
+        StudioSetting::set('qris_price_per_print', $request->price_per_print);
+        StudioSetting::set('qris_package_count', $request->package_count ?? 1);
 
         session([
             'qris_gateway'         => $request->payment_gateway,
@@ -204,7 +220,7 @@ class AdminDashboardController extends Controller
             'qris_package_count'   => $request->package_count ?? 1,
         ]);
 
-        return back()->with('success', 'Konfigurasi QRIS & Harga berhasil disimpan!');
+        return back()->with('success', 'Konfigurasi QRIS & Harga berhasil disimpan secara permanen!');
     }
 
     /**
@@ -214,34 +230,71 @@ class AdminDashboardController extends Controller
     {
         $user = Auth::user();
 
-        $templates = [
-            [
-                'id' => 'classic-4-grid',
-                'name' => 'Classic 4–Grid',
-                'size' => '1200 x 1800 px',
-                'is_default' => true,
-            ],
-            [
-                'id' => 'cinematic-strip',
-                'name' => 'Cinematic Strip',
-                'size' => '600 x 1800 px',
-                'is_default' => false,
-            ],
-            [
-                'id' => 'polaroid-wide',
-                'name' => 'Polaroid Wide',
-                'size' => '1600 x 1600 px',
-                'is_default' => false,
-            ],
-            [
-                'id' => 'passport-trio',
-                'name' => 'Passport Trio',
-                'size' => '1800 x 1200 px',
-                'is_default' => false,
-            ],
-        ];
+        $all = \App\Http\Controllers\BoothController::getAllTemplates();
+        $templates = array_values($all);
+        $activeTemplateId = StudioSetting::get('default_template_id', session('booth_session.template_id', 'classic-4-grid'));
+        foreach ($templates as &$tmpl) {
+            $tmpl['is_default'] = ($tmpl['id'] === $activeTemplateId);
+            $tmpl['size'] = $tmpl['aspect'] ?? '1200 x 1800 px';
+        }
 
         return view('admin.templates', compact('user', 'templates'));
+    }
+
+    public function setDefaultTemplate(Request $request)
+    {
+        $request->validate([
+            'template_id' => 'required|string',
+        ]);
+
+        StudioSetting::set('default_template_id', $request->template_id);
+        session(['booth_session.template_id' => $request->template_id]);
+
+        return back()->with('success', 'Template default berhasil diubah dan disimpan!');
+    }
+
+    /**
+     * Unggah Template Kolase Kustom (Overlay PNG Transparan)
+     */
+    public function uploadTemplate(Request $request)
+    {
+        $request->validate([
+            'name'        => 'required|string|max:100',
+            'slots'       => 'required|integer|in:1,2,3,4,6,8',
+            'overlay'     => 'required|image|mimes:png|max:10240',
+            'bg_color'    => 'nullable|string',
+            'text_color'  => 'nullable|string',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $file = $request->file('overlay');
+        $slug = Str::slug($request->name) . '-' . time();
+        $filename = "{$slug}.png";
+        $path = $file->storeAs('templates/overlays', $filename, 'public');
+
+        $customTemplates = json_decode(StudioSetting::get('custom_templates', '[]'), true) ?: [];
+        $newTemplate = [
+            'id'             => 'custom-' . $slug,
+            'name'           => $request->name,
+            'category'       => ($request->slots == 8 ? '8_slots' : ($request->slots == 6 ? '6_slots' : ($request->slots == 4 ? '4_slots' : 'other_slots'))),
+            'category_label' => $request->slots . ' Kolase',
+            'frames'         => $request->slots . ' Frames',
+            'slots'          => (int) $request->slots,
+            'badge'          => '✨ Kustom',
+            'aspect'         => '1200 x 1800 px',
+            'bg_color'       => $request->bg_color ?: '#FFFFFF',
+            'text_color'     => $request->text_color ?: '#0F172A',
+            'accent'         => '#F5BD23',
+            'card_bg'        => 'bg-amber-500/10 border-amber-500/30 text-slate-900',
+            'description'    => $request->description ?: 'Template kolase kustom unggahan studio.',
+            'overlay_url'    => asset('storage/' . $path),
+            'is_custom'      => true,
+        ];
+
+        $customTemplates[] = $newTemplate;
+        StudioSetting::set('custom_templates', json_encode($customTemplates));
+
+        return back()->with('success', "Template kustom '{$request->name}' berhasil diunggah dan siap digunakan di bilik kiosk!");
     }
 
     /**
