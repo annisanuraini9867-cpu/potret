@@ -113,25 +113,11 @@
         </div>
     </header>
 
-    <!-- Flash Alerts -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-4">
-        @if(session('success'))
-            <div class="flex items-center justify-between p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm font-medium shadow-sm mb-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-emerald-600 font-bold text-lg">✓</span>
-                    <span>{{ session('success') }}</span>
-                </div>
-            </div>
-        @endif
+    <!-- Pop-up Toast Notifications -->
+    @include('partials.popup-notification')
 
-        @if(session('error'))
-            <div class="flex items-center justify-between p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-sm font-medium shadow-sm mb-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-rose-600 font-bold text-lg">⚠</span>
-                    <span>{{ session('error') }}</span>
-                </div>
-            </div>
-        @endif
+    <!-- Form Validation Errors if any -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-4">
 
         @if($errors->any())
             <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-sm shadow-sm mb-4">

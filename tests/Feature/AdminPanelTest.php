@@ -149,4 +149,17 @@ class AdminPanelTest extends TestCase
         $response->assertSee('Pengaturan Printer');
         $response->assertSee('Antrean Cetak');
     }
+
+    public function test_success_notification_renders_as_popup_toast(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->withSession(['success' => 'Operasi data berhasil dilakukan!'])
+            ->get(route('admin.dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('popup-toast-container');
+        $response->assertSee('popup-toast-item');
+        $response->assertSee('Aksi Berhasil!');
+        $response->assertSee('Operasi data berhasil dilakukan!');
+    }
 }

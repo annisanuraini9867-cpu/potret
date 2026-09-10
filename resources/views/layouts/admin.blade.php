@@ -409,13 +409,8 @@
         <!-- Main Content View Area -->
         <main class="flex-1 p-4 sm:p-6 lg:p-10 max-w-7xl overflow-y-auto w-full">
             
-            <!-- Toast Notification if any -->
-            @if(session('success'))
-                <div class="mb-6 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs font-bold flex items-center gap-2 shadow-sm animate-in fade-in">
-                    <span class="text-emerald-600 text-base">✓</span>
-                    <span>{{ session('success') }}</span>
-                </div>
-            @endif
+            <!-- Pop-up Toast Notifications -->
+            @include('partials.popup-notification')
 
             @yield('content')
         </main>

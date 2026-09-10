@@ -3,26 +3,7 @@
 @section('content')
 <div class="space-y-8">
 
-    <!-- Alert Notifikasi -->
-    @if(session('success'))
-    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-2">
-            <span>✅</span>
-            <span>{{ session('success') }}</span>
-        </div>
-        <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 text-base font-bold">&times;</button>
-    </div>
-    @endif
 
-    @if(session('error'))
-    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-2">
-            <span>⚠️</span>
-            <span>{{ session('error') }}</span>
-        </div>
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-900 text-base font-bold">&times;</button>
-    </div>
-    @endif
 
     <!-- Top Header & Actions -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
