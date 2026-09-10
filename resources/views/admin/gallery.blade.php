@@ -138,7 +138,7 @@
                             <span>ZIP</span>
                         </a>
 
-                        <form action="{{ route('gallery.photos.destroyAll', $session->booking_code) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus seluruh foto sesi {{ $session->booking_code }}?')" class="w-full">
+                        <form action="{{ route('gallery.photos.destroyAll', $session->booking_code) }}" method="POST" data-confirm="Apakah Anda yakin ingin menghapus seluruh foto sesi {{ $session->booking_code }}?" class="w-full">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="w-full py-2 px-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px] transition flex items-center justify-center gap-1 text-center" title="Hapus Seluruh Foto Sesi Ini">

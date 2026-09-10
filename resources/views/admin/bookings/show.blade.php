@@ -98,7 +98,7 @@
                     
                     <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
                         <span class="text-[10px] text-white/80 truncate">{{ $photo->file_name }}</span>
-                        <form action="{{ route('admin.photos.destroy', $photo->id) }}" method="POST" onsubmit="return confirm('Hapus foto ini?')">
+                        <form action="{{ route('admin.photos.destroy', $photo->id) }}" method="POST" data-confirm="Apakah Anda yakin ingin menghapus foto ini?">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="w-full py-1 bg-rose-600 text-white font-bold text-[10px] rounded-lg shadow hover:bg-rose-700 transition">

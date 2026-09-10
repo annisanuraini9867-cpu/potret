@@ -33,13 +33,7 @@
     <!-- Login Card Container -->
     <div class="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-10 md:p-12 shadow-sm border border-slate-100">
         
-        <!-- Alerts if any -->
-        @if(session('error'))
-            <div class="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold rounded-xl flex items-center gap-2">
-                <span>⚠</span>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
+
 
         @if($errors->any())
             <div class="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl">
@@ -156,5 +150,6 @@
             }
         }
     </script>
+    @include('partials.popup-notification')
 </body>
 </html>

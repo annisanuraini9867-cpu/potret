@@ -2,26 +2,6 @@
 
 @section('content')
 <div class="space-y-8">
-    <!-- Alert Notifikasi -->
-    @if(session('success'))
-    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-2">
-            <span>✅</span>
-            <span>{{ session('success') }}</span>
-        </div>
-        <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900 text-base font-bold">&times;</button>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-2">
-            <span>⚠️</span>
-            <span>{{ session('error') }}</span>
-        </div>
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-900 text-base font-bold">&times;</button>
-    </div>
-    @endif
 
     <!-- Header Galeri -->
     <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -46,7 +26,7 @@
                 <span>📦 Unduh Semua (ZIP)</span>
                 <span class="text-[10px] bg-emerald-800 px-2 py-0.5 rounded-full">{{ $booking->photos->count() }} Foto</span>
             </a>
-            <form action="{{ route('gallery.photos.destroyAll', $booking->booking_code) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus SELURUH foto (termasuk kolase) pada sesi {{ $booking->booking_code }}? Tindakan ini permanen!')" class="inline">
+            <form action="{{ route('gallery.photos.destroyAll', $booking->booking_code) }}" method="POST" data-confirm="Apakah Anda yakin ingin menghapus SELURUH foto (termasuk kolase) pada sesi {{ $booking->booking_code }}? Tindakan ini permanen!" class="inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 font-bold text-xs border border-rose-200 shadow-sm transition">
@@ -84,7 +64,7 @@
                 <a href="{{ $collage->url }}" target="_blank" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs backdrop-blur border border-white/20 transition">
                     🔍 Lihat Ukuran Penuh
                 </a>
-                <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $collage->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus bingkai kolase ini?')" class="inline">
+                <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $collage->id]) }}" method="POST" data-confirm="Apakah Anda yakin ingin menghapus bingkai kolase ini?" class="inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="px-5 py-3 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white font-bold text-xs backdrop-blur border border-rose-400/30 transition flex items-center gap-1.5 shadow">
@@ -114,7 +94,7 @@
                         <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-[11px] font-bold text-white/90">Slot #{{ $loop->iteration }}</span>
-                                <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $photo->id]) }}" method="POST" onsubmit="return confirm('Hapus foto Slot #{{ $loop->iteration }} ini dari galeri?')">
+                                <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $photo->id]) }}" method="POST" data-confirm="Hapus foto Slot #{{ $loop->iteration }} ini dari galeri?">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs shadow transition flex items-center justify-center" title="Hapus Foto">
@@ -138,7 +118,7 @@
                         <span class="font-bold text-slate-700 text-[11px]">Slot #{{ $loop->iteration }}</span>
                         <div class="flex items-center gap-1.5">
                             <a href="{{ $photo->url }}" download="{{ $photo->file_name }}" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold">⬇</a>
-                            <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $photo->id]) }}" method="POST" onsubmit="return confirm('Hapus foto ini?')">
+                            <form action="{{ route('gallery.photos.destroy', [$booking->booking_code, $photo->id]) }}" method="POST" data-confirm="Hapus foto ini?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-700 text-[10px] font-bold">🗑</button>

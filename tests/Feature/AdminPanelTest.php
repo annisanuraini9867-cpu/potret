@@ -161,5 +161,19 @@ class AdminPanelTest extends TestCase
         $response->assertSee('popup-toast-item');
         $response->assertSee('Aksi Berhasil!');
         $response->assertSee('Operasi data berhasil dilakukan!');
+        $response->assertSee('centered-popup-overlay');
+        $response->assertSee('centered-confirm-overlay');
+    }
+
+    public function test_admin_pages_use_modern_centered_confirm_modal_without_native_confirm(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.gallery'));
+        $response->assertStatus(200);
+        $response->assertDontSee('onsubmit="return confirm(');
+        $response->assertSee('centered-confirm-overlay');
+
+        $responseTemplates = $this->actingAs($this->admin)->get(route('admin.templates'));
+        $responseTemplates->assertStatus(200);
+        $responseTemplates->assertDontSee('onsubmit="return confirm(');
     }
 }

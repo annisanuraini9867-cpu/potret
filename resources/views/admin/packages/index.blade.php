@@ -53,7 +53,7 @@
                         <a href="{{ route('admin.packages.edit', $pkg->id) }}" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
                             Edit
                         </a>
-                        <form action="{{ route('admin.packages.destroy', $pkg->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus paket ini?')">
+                        <form action="{{ route('admin.packages.destroy', $pkg->id) }}" method="POST" class="inline" data-confirm="Apakah Anda yakin ingin menghapus paket {{ $pkg->name }}?">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 transition" title="Hapus">

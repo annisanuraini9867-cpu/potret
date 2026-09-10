@@ -19,12 +19,6 @@
         </button>
     </div>
 
-    @if (session('success'))
-    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-        <span>✓</span>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
 
     <!-- Search & Filter Controls -->
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -218,7 +212,7 @@
                     </button>
 
                     @if ($isCustom)
-                    <form action="{{ route('admin.templates.delete', $tmpl['id']) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus template kustom {{ $tmpl['name'] }}?')" class="inline">
+                    <form action="{{ route('admin.templates.delete', $tmpl['id']) }}" method="POST" data-confirm="Apakah Anda yakin ingin menghapus template kustom {{ $tmpl['name'] }}?" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" 

@@ -112,7 +112,7 @@
                             <a href="{{ route('admin.bookings.show', $b->id) }}" class="inline-flex items-center px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition">
                                 Detail & Upload Foto
                             </a>
-                            <form action="{{ route('admin.bookings.destroy', $b->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus reservasi ini secara permanen?')">
+                            <form action="{{ route('admin.bookings.destroy', $b->id) }}" method="POST" class="inline" data-confirm="Apakah Anda yakin ingin menghapus reservasi {{ $b->booking_code }} ({{ $b->customer_name }}) secara permanen?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 transition" title="Hapus">
