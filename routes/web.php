@@ -83,6 +83,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/templates', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'templates'])->name('templates');
     Route::post('/templates/default', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'setDefaultTemplate'])->name('templates.setDefault');
     Route::post('/templates/upload', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'uploadTemplate'])->name('templates.upload');
+    Route::delete('/templates/{id}', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'deleteTemplate'])->name('templates.delete');
     Route::get('/status', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'status'])->name('status');
 
     // Manajemen Reservasi

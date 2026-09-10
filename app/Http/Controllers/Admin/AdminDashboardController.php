@@ -298,6 +298,25 @@ class AdminDashboardController extends Controller
     }
 
     /**
+     * Hapus Template Kolase Kustom
+     */
+    public function deleteTemplate(string $id)
+    {
+        $customTemplates = json_decode(StudioSetting::get('custom_templates', '[]'), true) ?: [];
+        $customTemplates = array_values(array_filter($customTemplates, function ($t) use ($id) {
+            return ($t['id'] ?? '') !== $id;
+        }));
+        StudioSetting::set('custom_templates', json_encode($customTemplates));
+
+        // Jika template yang dihapus adalah template default, kembalikan ke default classic-4-grid
+        if (StudioSetting::get('default_template_id') === $id) {
+            StudioSetting::set('default_template_id', 'classic-4-grid');
+        }
+
+        return back()->with('success', 'Template kustom berhasil dihapus!');
+    }
+
+    /**
      * 6. Status Sistem - Sesuai Gambar
      */
     public function status()

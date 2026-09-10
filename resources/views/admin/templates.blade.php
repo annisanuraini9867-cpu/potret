@@ -26,44 +26,75 @@
     </div>
     @endif
 
+    <!-- Search & Filter Controls -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </span>
+            <input type="text" id="admin-template-search" 
+                   oninput="handleAdminSearch(this.value)" 
+                   placeholder="Cari nama template, jumlah pose, dll..." 
+                   class="w-full pl-10 pr-9 py-2.5 rounded-xl text-xs font-medium bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5BD23] focus:border-transparent transition">
+            <button type="button" id="admin-search-clear" onclick="clearAdminSearch()" 
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden"
+                    title="Hapus pencarian">
+                ✕
+            </button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-mono">
+            <span>Menampilkan:</span>
+            <span id="admin-visible-count" class="font-bold text-slate-900 dark:text-white">{{ count($templates) }}</span>
+            <span>dari {{ count($templates) }} template</span>
+        </div>
+    </div>
+
     <!-- Category Filter Pills -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-1">
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
         <button type="button" onclick="filterAdminCategory('all')" id="tab-admin-all" 
-                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-black bg-slate-900 text-white shadow-sm transition">
-            Semua Template ({{ count($templates) }})
+                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-black bg-slate-900 dark:bg-amber-400 text-white dark:text-slate-950 shadow-sm transition whitespace-nowrap">
+            Semua ({{ count($templates) }})
+        </button>
+        <button type="button" onclick="filterAdminCategory('custom')" id="tab-admin-custom" 
+                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap">
+            ✨ Kustom ({{ count(array_filter($templates, fn($t) => !empty($t['is_custom']))) }})
         </button>
         <button type="button" onclick="filterAdminCategory('8_slots')" id="tab-admin-8_slots" 
-                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 transition">
+                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap">
             🎉 8 Kolase ({{ count(array_filter($templates, fn($t) => ($t['slots'] ?? 0) == 8)) }})
         </button>
         <button type="button" onclick="filterAdminCategory('6_slots')" id="tab-admin-6_slots" 
-                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 transition">
+                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap">
             🌸 6 Kolase ({{ count(array_filter($templates, fn($t) => ($t['slots'] ?? 0) == 6)) }})
         </button>
         <button type="button" onclick="filterAdminCategory('4_slots')" id="tab-admin-4_slots" 
-                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 transition">
+                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap">
             ⭐ 4 Kolase ({{ count(array_filter($templates, fn($t) => ($t['slots'] ?? 0) == 4)) }})
         </button>
         <button type="button" onclick="filterAdminCategory('other_slots')" id="tab-admin-other_slots" 
-                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 transition">
+                class="admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap">
             🎬 3, 2 & 1 Kolase ({{ count(array_filter($templates, fn($t) => ($t['slots'] ?? 0) < 4)) }})
         </button>
     </div>
 
     <!-- Template Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div id="admin-templates-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         
         <!-- 1. Dropzone Upload Card (Dashed Border) -->
-        <div onclick="openUploadTemplateModal()" 
-             class="border-2 border-dashed border-slate-300 hover:border-[#F5BD23] bg-white/60 hover:bg-white rounded-3xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[300px] space-y-3 group shadow-sm hover:shadow-md">
-            <div class="w-14 h-14 rounded-2xl bg-slate-100 group-hover:bg-amber-50 text-slate-400 group-hover:text-amber-600 flex items-center justify-center text-2xl transition">
+        <div id="admin-upload-card" onclick="openUploadTemplateModal()" 
+             class="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#F5BD23] dark:hover:border-[#F5BD23] bg-white/60 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-900 rounded-3xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[300px] space-y-3 group shadow-sm hover:shadow-md">
+            <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 group-hover:bg-amber-50 dark:group-hover:bg-amber-950/40 text-slate-400 dark:text-slate-500 group-hover:text-amber-600 dark:group-hover:text-amber-400 flex items-center justify-center text-2xl transition">
                 🖼
             </div>
             <div>
-                <h4 class="font-extrabold text-sm text-slate-800">Unggah Template Baru</h4>
-                <p class="text-[11px] text-slate-400 mt-0.5">PNG Transparan (Maks 10MB)</p>
+                <h4 class="font-extrabold text-sm text-slate-800 dark:text-white">Unggah Template Baru</h4>
+                <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">PNG Transparan (Maks 10MB)</p>
             </div>
-            <span class="text-[10px] font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-600 group-hover:bg-amber-100 group-hover:text-amber-900 transition">
+            <span class="text-[10px] font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/50 group-hover:text-amber-900 dark:group-hover:text-amber-300 transition">
                 + Tambah Layout
             </span>
         </div>
@@ -74,19 +105,29 @@
             $isDefault = $tmpl['is_default'] ?? false;
             $cat = $tmpl['category'] ?? '4_slots';
             $slots = $tmpl['slots'] ?? 4;
+            $isCustom = !empty($tmpl['is_custom']);
         @endphp
         <div data-category="{{ $cat }}" 
-             class="admin-tmpl-card bg-white rounded-3xl border border-slate-200/80 shadow-sm hover:shadow-md overflow-hidden flex flex-col justify-between transition group">
+             data-custom="{{ $isCustom ? '1' : '0' }}"
+             data-name="{{ strtolower($tmpl['name']) }}"
+             data-desc="{{ strtolower($tmpl['description'] ?? '') }}"
+             data-slots="{{ $slots }}"
+             class="admin-tmpl-card bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md overflow-hidden flex flex-col justify-between transition group">
             
             <!-- Card Preview Box -->
             <div class="relative p-5 aspect-[4/3] flex items-center justify-center overflow-hidden transition-colors"
                  style="background-color: {{ $tmpl['bg_color'] ?? '#F8FAFC' }};">
                 
                 <!-- Badges -->
-                <div class="absolute top-3 left-3 flex items-center gap-1.5 z-10">
+                <div class="absolute top-3 left-3 flex items-center gap-1.5 z-10 flex-wrap">
                     @if ($isDefault)
                     <span class="px-2.5 py-0.5 rounded-full bg-[#F5BD23] text-slate-950 font-black text-[10px] shadow-sm">
                         ★ Default Kiosk
+                    </span>
+                    @endif
+                    @if ($isCustom)
+                    <span class="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] shadow-sm">
+                        ✨ Kustom
                     </span>
                     @endif
                     <span class="px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur text-white font-mono font-bold text-[10px]">
@@ -94,59 +135,69 @@
                     </span>
                 </div>
 
-                <span class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 bg-white/70 backdrop-blur px-2 py-0.5 rounded-full">
+                <span class="absolute top-3 right-3 text-[10px] font-mono text-slate-500 bg-white/70 dark:bg-slate-900/70 backdrop-blur px-2 py-0.5 rounded-full">
                     {{ $tmpl['size'] ?? '1200 x 1800 px' }}
                 </span>
 
-                <!-- Schematic Mini Mockup Grid -->
-                <div class="w-20 h-28 bg-white/90 rounded-md shadow-md p-1 border border-slate-300 flex flex-col justify-between">
-                    <span class="text-[5px] font-bold text-center block text-slate-600 truncate">{{ $tmpl['name'] }}</span>
-                    
-                    @if ($slots == 8)
-                        <div class="grid grid-cols-2 gap-0.5 flex-1 my-0.5">
-                            @for ($s=0; $s<8; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
-                        </div>
-                    @elseif ($slots == 6)
-                        <div class="grid grid-cols-2 gap-0.5 flex-1 my-0.5">
-                            @for ($s=0; $s<6; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
-                        </div>
-                    @elseif ($slots == 3)
-                        <div class="grid grid-rows-3 gap-0.5 flex-1 my-0.5">
-                            @for ($s=0; $s<3; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
-                        </div>
-                    @elseif ($slots == 2)
-                        <div class="grid grid-rows-2 gap-0.5 flex-1 my-0.5">
-                            @for ($s=0; $s<2; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
-                        </div>
-                    @elseif ($slots == 1)
-                        <div class="bg-slate-200 rounded-[1px] flex-1 my-0.5"></div>
-                    @else
-                        <div class="grid grid-cols-2 gap-0.5 flex-1 my-0.5">
-                            @for ($s=0; $s<4; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
-                        </div>
-                    @endif
+                @if (!empty($tmpl['overlay_url']))
+                    <!-- Custom Template Overlay Image -->
+                    <div class="w-20 h-28 bg-white/95 rounded-md shadow-md p-1 border border-slate-300 flex items-center justify-center relative overflow-hidden group/img">
+                        <img src="{{ $tmpl['overlay_url'] }}" alt="{{ $tmpl['name'] }}" class="w-full h-full object-contain">
+                        <span class="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-amber-500 text-slate-950 text-[7px] font-black uppercase shadow">
+                            PNG
+                        </span>
+                    </div>
+                @else
+                    <!-- Schematic Mini Mockup Grid -->
+                    <div class="w-20 h-28 bg-white/90 rounded-md shadow-md p-1 border border-slate-300 flex flex-col justify-between">
+                        <span class="text-[5px] font-bold text-center block text-slate-600 truncate">{{ $tmpl['name'] }}</span>
+                        
+                        @if ($slots == 8)
+                            <div class="grid grid-cols-2 gap-0.5 flex-1 my-0.5">
+                                @for ($s=0; $s<8; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
+                            </div>
+                        @elseif ($slots == 6)
+                            <div class="grid grid-cols-2 gap-0.5 flex-1 my-0.5">
+                                @for ($s=0; $s<6; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
+                            </div>
+                        @elseif ($slots == 3)
+                            <div class="grid grid-rows-3 gap-0.5 flex-1 my-0.5">
+                                @for ($s=0; $s<3; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
+                            </div>
+                        @elseif ($slots == 2)
+                            <div class="grid grid-rows-2 gap-0.5 flex-1 my-0.5">
+                                @for ($s=0; $s<2; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
+                            </div>
+                        @elseif ($slots == 1)
+                            <div class="bg-slate-200 rounded-[1px] flex-1 my-0.5"></div>
+                        @else
+                            <div class="grid grid-cols-2 gap-0.5 flex-1 my-0.5">
+                                @for ($s=0; $s<4; $s++) <span class="bg-slate-200 rounded-[1px]"></span> @endfor
+                            </div>
+                        @endif
 
-                    <span class="text-[4px] font-mono text-center block text-slate-400">POTRET DIRI</span>
-                </div>
+                        <span class="text-[4px] font-mono text-center block text-slate-400">POTRET DIRI</span>
+                    </div>
+                @endif
             </div>
 
             <!-- Card Bottom Body -->
-            <div class="p-5 space-y-3 flex-1 flex flex-col justify-between bg-white">
+            <div class="p-5 space-y-3 flex-1 flex flex-col justify-between bg-white dark:bg-slate-900">
                 <div class="space-y-1">
                     <div class="flex items-center justify-between">
-                        <h4 class="font-extrabold text-sm text-slate-900 group-hover:text-amber-600 transition">
+                        <h4 class="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-amber-500 transition truncate">
                             {{ $tmpl['name'] }}
                         </h4>
                     </div>
-                    <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                         {{ $tmpl['description'] ?? 'Template kolase photobooth premium.' }}
                     </p>
                 </div>
 
-                <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
                     @if ($isDefault)
                     <button type="button" disabled 
-                            class="flex-1 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 font-bold text-xs cursor-default text-center">
+                            class="flex-1 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-300 font-bold text-xs cursor-default text-center">
                         ✓ Aktif Default
                     </button>
                     @else
@@ -154,7 +205,7 @@
                         @csrf
                         <input type="hidden" name="template_id" value="{{ $tmpl['id'] }}">
                         <button type="submit" 
-                                class="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs transition">
+                                class="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-200 font-bold text-xs transition">
                             Set Default
                         </button>
                     </form>
@@ -162,57 +213,83 @@
 
                     <button type="button" onclick="openAdminPreviewModal('{{ $tmpl['id'] }}')" 
                             title="Lihat Desain Frame Lengkap"
-                            class="p-2 rounded-xl border border-slate-200 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700 text-slate-600 text-xs transition">
+                            class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-800 hover:border-amber-300 dark:hover:border-amber-500 hover:text-amber-700 dark:hover:text-amber-400 text-slate-600 dark:text-slate-300 text-xs transition">
                         👁
                     </button>
+
+                    @if ($isCustom)
+                    <form action="{{ route('admin.templates.delete', $tmpl['id']) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus template kustom {{ $tmpl['name'] }}?')" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                title="Hapus Template Kustom"
+                                class="p-2 rounded-xl border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 text-xs transition">
+                            🗑️
+                        </button>
+                    </form>
+                    @endif
                 </div>
             </div>
 
         </div>
         @endforeach
 
+        <!-- Empty Search State -->
+        <div id="admin-no-templates" class="hidden col-span-full py-16 text-center space-y-3">
+            <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center text-2xl mx-auto">
+                🔍
+            </div>
+            <h4 class="font-extrabold text-base text-slate-800 dark:text-white">Tidak Ada Template yang Cocok</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                Tidak ditemukan template dengan kata kunci tersebut. Coba kata kunci lain atau pilih tab Semua.
+            </p>
+            <button type="button" onclick="clearAdminSearch()" class="px-4 py-2 rounded-xl bg-[#F5BD23] text-slate-950 font-bold text-xs hover:bg-amber-400 transition">
+                Reset Pencarian
+            </button>
+        </div>
+
     </div>
 
     <!-- Modal: Pratinjau Desain Frame Admin -->
     <div id="admin-preview-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden animate-in fade-in duration-200">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
             
             <!-- Modal Header -->
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-bold text-lg">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/50 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-lg">
                         🖼️
                     </div>
                     <div>
-                        <h3 class="text-base font-black text-slate-900" id="admin-modal-title">
+                        <h3 class="text-base font-black text-slate-900 dark:text-white" id="admin-modal-title">
                             Desain Frame Photobooth
                         </h3>
-                        <p class="text-[11px] text-slate-500 font-mono" id="admin-modal-specs">
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-mono" id="admin-modal-specs">
                             4 Pose • 1200 x 1800 px
                         </p>
                     </div>
                 </div>
                 <button type="button" onclick="closeAdminPreviewModal()" 
-                        class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition">
+                        class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition">
                     ✕
                 </button>
             </div>
 
             <!-- Modal Canvas Preview Container -->
-            <div class="flex-1 overflow-y-auto flex items-center justify-center p-3 bg-slate-950 rounded-2xl border border-slate-200">
+            <div class="flex-1 overflow-y-auto flex items-center justify-center p-3 bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
                 <canvas id="admin-modal-canvas" width="600" height="900" class="max-h-[50vh] sm:max-h-[55vh] w-auto rounded-xl shadow-2xl object-contain"></canvas>
             </div>
 
             <!-- Modal Footer Info & Actions -->
             <div class="space-y-3 pt-2">
-                <div class="flex items-center justify-between text-xs text-slate-600 px-1">
-                    <span class="font-mono text-[11px] text-slate-500">Resolusi Cetak: 1200 x 1800 px (300 DPI)</span>
-                    <span class="text-emerald-600 font-bold text-xs">✓ Siap Digunakan</span>
+                <div class="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 px-1">
+                    <span class="font-mono text-[11px] text-slate-500 dark:text-slate-400">Resolusi Cetak: 1200 x 1800 px (300 DPI)</span>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold text-xs">✓ Siap Digunakan</span>
                 </div>
 
                 <div class="flex items-center gap-2">
                     <button type="button" onclick="closeAdminPreviewModal()" 
-                            class="w-full py-3 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 text-xs font-bold text-slate-700 transition text-center">
+                            class="w-full py-3 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-xs font-bold text-slate-700 dark:text-slate-200 transition text-center">
                         Tutup Pratinjau
                     </button>
                 </div>
@@ -223,26 +300,26 @@
 
     <!-- Modal Unggah Template Kolase Kustom -->
     <div id="admin-upload-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 space-y-6 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 relative animate-in fade-in zoom-in-95 space-y-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
-                    <h3 class="text-lg font-black text-slate-900">Unggah Template Kolase Baru</h3>
+                    <h3 class="text-lg font-black text-slate-900 dark:text-white">Unggah Template Kolase Baru</h3>
                     <p class="text-xs text-slate-400 mt-0.5">Desain overlay frame kustom resolusi tinggi untuk bilik kiosk</p>
                 </div>
-                <button type="button" onclick="closeUploadTemplateModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center font-bold text-base">&times;</button>
+                <button type="button" onclick="closeUploadTemplateModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center font-bold text-base">&times;</button>
             </div>
 
             <form action="{{ route('admin.templates.upload') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Desain Template</label>
-                    <input type="text" name="name" placeholder="Contoh: Romantic Floral 4–Cut" required class="w-full px-4 py-2.5 bg-slate-100 rounded-xl border border-transparent text-xs font-bold text-slate-800 focus:bg-white focus:border-[#F5BD23] focus:outline-none">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Desain Template</label>
+                    <input type="text" name="name" placeholder="Contoh: Romantic Floral 4–Cut" required class="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-transparent dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:border-[#F5BD23] focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Jumlah Slot Foto</label>
-                        <select name="slots" required class="w-full px-4 py-2.5 bg-slate-100 rounded-xl border border-transparent text-xs font-bold text-slate-800 focus:bg-white focus:border-[#F5BD23] focus:outline-none">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jumlah Slot Foto</label>
+                        <select name="slots" required class="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-transparent dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:border-[#F5BD23] focus:outline-none">
                             <option value="8">8 Kolase (Party / Twin Strip)</option>
                             <option value="6">6 Kolase (2x3 Grid / Filmstrip)</option>
                             <option value="4" selected>4 Kolase (Classic / Korean)</option>
@@ -252,20 +329,20 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Warna Background</label>
-                        <input type="color" name="bg_color" value="#FFFFFF" class="w-full h-10 rounded-xl p-1 bg-slate-100 border border-slate-200 cursor-pointer">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Warna Background</label>
+                        <input type="color" name="bg_color" value="#FFFFFF" class="w-full h-10 rounded-xl p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 cursor-pointer">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">File Overlay Transparan (PNG)</label>
-                    <input type="file" name="overlay" accept="image/png" required class="w-full px-3 py-2 bg-slate-100 rounded-xl border border-dashed border-slate-300 text-xs text-slate-600 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#F5BD23] file:text-slate-950 cursor-pointer">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">File Overlay Transparan (PNG)</label>
+                    <input type="file" name="overlay" accept="image/png" required class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#F5BD23] file:text-slate-950 cursor-pointer">
                     <span class="text-[10px] text-slate-400 mt-1 block">Rekomendasi resolusi: 1200 x 1800 px, format PNG transparan, maks. 10MB.</span>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Deskripsi Singkat (Opsional)</label>
-                    <input type="text" name="description" placeholder="Deskripsi untuk tampilan katalog..." class="w-full px-4 py-2.5 bg-slate-100 rounded-xl border border-transparent text-xs text-slate-800 focus:bg-white focus:border-[#F5BD23] focus:outline-none">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Deskripsi Singkat (Opsional)</label>
+                    <input type="text" name="description" placeholder="Deskripsi untuk tampilan katalog..." class="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-transparent dark:border-slate-700 text-xs text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:border-[#F5BD23] focus:outline-none">
                 </div>
 
                 <div class="pt-3 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 border-t border-slate-100 dark:border-slate-800">
@@ -456,29 +533,116 @@
         }
 
         ctx.restore();
+
+        // 5. Draw Custom Overlay if present
+        if (tmpl.overlay_url) {
+            const overlayImg = new Image();
+            overlayImg.crossOrigin = 'anonymous';
+            overlayImg.onload = () => {
+                ctx.drawImage(overlayImg, 0, 0, canvas.width, canvas.height);
+            };
+            overlayImg.src = tmpl.overlay_url;
+        }
+    }
+
+    let currentAdminCategory = 'all';
+    let currentAdminSearch = '';
+
+    function handleAdminSearch(val) {
+        currentAdminSearch = (val || '').trim().toLowerCase();
+        const clearBtn = document.getElementById('admin-search-clear');
+        if (clearBtn) {
+            if (currentAdminSearch.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+        applyAdminFilters();
+    }
+
+    function clearAdminSearch() {
+        const searchInput = document.getElementById('admin-template-search');
+        if (searchInput) searchInput.value = '';
+        currentAdminSearch = '';
+        const clearBtn = document.getElementById('admin-search-clear');
+        if (clearBtn) clearBtn.classList.add('hidden');
+        applyAdminFilters();
     }
 
     function filterAdminCategory(cat) {
-        const tabs = ['all', '8_slots', '6_slots', '4_slots', 'other_slots'];
+        currentAdminCategory = cat;
+        applyAdminFilters();
+    }
+
+    function applyAdminFilters() {
+        const tabs = ['all', 'custom', '8_slots', '6_slots', '4_slots', 'other_slots'];
         tabs.forEach(t => {
             const el = document.getElementById('tab-admin-' + t);
             if (!el) return;
-            if (t === cat) {
-                el.className = 'admin-cat-tab px-4 py-2 rounded-xl text-xs font-black bg-slate-900 text-white shadow-sm transition';
+            if (t === currentAdminCategory) {
+                el.className = 'admin-cat-tab px-4 py-2 rounded-xl text-xs font-black bg-slate-900 dark:bg-amber-400 text-white dark:text-slate-950 shadow-sm transition whitespace-nowrap';
             } else {
-                el.className = 'admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 transition';
+                el.className = 'admin-cat-tab px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap';
             }
         });
 
         const cards = document.querySelectorAll('.admin-tmpl-card');
+        let visibleCount = 0;
+
         cards.forEach(card => {
             const cardCat = card.getAttribute('data-category');
-            if (cat === 'all' || cardCat === cat) {
+            const isCustom = card.getAttribute('data-custom') === '1';
+            const name = card.getAttribute('data-name') || '';
+            const desc = card.getAttribute('data-desc') || '';
+            const slots = card.getAttribute('data-slots') || '';
+
+            let matchesCat = false;
+            if (currentAdminCategory === 'all') {
+                matchesCat = true;
+            } else if (currentAdminCategory === 'custom') {
+                matchesCat = isCustom;
+            } else {
+                matchesCat = (cardCat === currentAdminCategory);
+            }
+
+            let matchesSearch = true;
+            if (currentAdminSearch) {
+                const searchSlotMatch = currentAdminSearch.replace(/[^0-9]/g, '');
+                matchesSearch = name.includes(currentAdminSearch) ||
+                                desc.includes(currentAdminSearch) ||
+                                (isCustom && 'kustom custom'.includes(currentAdminSearch)) ||
+                                (searchSlotMatch && slots === searchSlotMatch);
+            }
+
+            if (matchesCat && matchesSearch) {
                 card.style.display = 'flex';
+                visibleCount++;
             } else {
                 card.style.display = 'none';
             }
         });
+
+        const uploadCard = document.getElementById('admin-upload-card');
+        if (uploadCard) {
+            if ((currentAdminCategory === 'all' || currentAdminCategory === 'custom') && !currentAdminSearch) {
+                uploadCard.style.display = 'flex';
+            } else {
+                uploadCard.style.display = 'none';
+            }
+        }
+
+        const countEl = document.getElementById('admin-visible-count');
+        if (countEl) countEl.innerText = visibleCount;
+
+        const noTemplatesEl = document.getElementById('admin-no-templates');
+        if (noTemplatesEl) {
+            if (visibleCount === 0) {
+                noTemplatesEl.classList.remove('hidden');
+            } else {
+                noTemplatesEl.classList.add('hidden');
+            }
+        }
     }
 
     window.addEventListener('keydown', (e) => {

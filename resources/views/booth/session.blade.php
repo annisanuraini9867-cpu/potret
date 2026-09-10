@@ -2453,6 +2453,23 @@
                     ctx.fillStyle = accentColor;
                     ctx.fillText(`${BOOKING_CODE} • ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} • LUMABOOTH KIOSK`, canvas.width / 2, canvas.height - 45);
                 }
+
+                // If template has custom overlay PNG, draw it over the entire composite
+                if (TEMPLATE_CONFIG && TEMPLATE_CONFIG.overlay_url) {
+                    const overlayImg = new Image();
+                    overlayImg.crossOrigin = 'anonymous';
+                    overlayImg.onload = () => {
+                        ctx.drawImage(overlayImg, 0, 0, canvas.width, canvas.height);
+                        if (baseStripCanvas) {
+                            baseStripCanvas.getContext('2d').drawImage(canvas, 0, 0);
+                        }
+                        const updatedDataUrl = canvas.toDataURL('image/jpeg', 0.95);
+                        const printImg = document.getElementById('preview-print-img');
+                        if (printImg) printImg.src = updatedDataUrl;
+                        bakeStickersToCanvas();
+                    };
+                    overlayImg.src = TEMPLATE_CONFIG.overlay_url;
+                }
             }
 
             // 5. Load and Draw all Photos
@@ -2788,6 +2805,15 @@
             }
 
             ctx.restore();
+
+            if (TEMPLATE_CONFIG && TEMPLATE_CONFIG.overlay_url) {
+                const overlayImg = new Image();
+                overlayImg.crossOrigin = 'anonymous';
+                overlayImg.onload = () => {
+                    ctx.drawImage(overlayImg, 0, 0, canvas.width, canvas.height);
+                };
+                overlayImg.src = TEMPLATE_CONFIG.overlay_url;
+            }
         }
 
         // ========================================================

@@ -18,7 +18,7 @@ class BoothController extends Controller
      */
     public static function getAllTemplates(): array
     {
-        return [
+        $templates = [
             // ==========================================
             // KATEGORI 8 KOLASE (8 POSES / SLOTS)
             // ==========================================

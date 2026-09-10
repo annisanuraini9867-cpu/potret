@@ -75,11 +75,35 @@
             </p>
         </div>
 
+        <!-- Search Bar -->
+        <div class="max-w-xl mx-auto w-full px-2">
+            <div class="relative flex items-center">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <svg class="w-5 h-5 text-[#F5BD23]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </span>
+                <input type="text" id="booth-template-search" 
+                       oninput="handleBoothSearch(this.value)" 
+                       placeholder="Cari template atau jumlah pose (contoh: Memory, Korea, 4 Pose)..." 
+                       class="w-full pl-12 pr-10 py-3 rounded-2xl text-xs sm:text-sm bg-white/5 hover:bg-white/10 focus:bg-white/10 border border-white/15 focus:border-[#F5BD23] text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F5BD23]/40 transition shadow-inner">
+                <button type="button" id="booth-search-clear" onclick="clearBoothSearch()" 
+                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition hidden"
+                        title="Hapus pencarian">
+                    ✕
+                </button>
+            </div>
+        </div>
+
         <!-- Filter Category Tabs -->
         <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto custom-scrollbar py-2 px-1">
             <button type="button" onclick="filterCategory('all')" id="tab-all"
                     class="filter-tab px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition whitespace-nowrap bg-[#F5BD23] text-slate-950 shadow-lg shadow-amber-500/20">
                 Semua Desain ({{ count($templates) }})
+            </button>
+            <button type="button" onclick="filterCategory('custom')" id="tab-custom"
+                    class="filter-tab px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition whitespace-nowrap bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10">
+                ✨ Kustom ({{ count(array_filter($templates, fn($t) => !empty($t['is_custom']))) }})
             </button>
             <button type="button" onclick="filterCategory('8_slots')" id="tab-8_slots"
                     class="filter-tab px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition whitespace-nowrap bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10">
@@ -152,17 +176,20 @@
                     $isSelected = ($selectedTemplate === $tmpl['id']);
                     $slots = $tmpl['slots'] ?? 4;
                     $cat = $tmpl['category'] ?? '4_slots';
+                    $isCustom = !empty($tmpl['is_custom']);
                 @endphp
                 <div onclick="selectTemplateCard('{{ $tmpl['id'] }}')" 
                      id="card-{{ $tmpl['id'] }}"
                      data-category="{{ $cat }}"
-                     data-name="{{ $tmpl['name'] }}"
+                     data-custom="{{ $isCustom ? '1' : '0' }}"
+                     data-name="{{ strtolower($tmpl['name']) }}"
+                     data-desc="{{ strtolower($tmpl['description'] ?? '') }}"
                      data-slots="{{ $slots }}"
                      class="template-card relative bg-[#131926] hover:bg-[#172033] rounded-3xl p-5 shadow-xl border-2 {{ $isSelected ? 'border-[#F5BD23] ring-4 ring-[#F5BD23]/20 bg-[#172033]' : 'border-white/10' }} hover:border-[#F5BD23]/60 cursor-pointer transition-all duration-300 flex flex-col justify-between space-y-4 group">
                     
                     <!-- Top Card Badges -->
                     <div class="flex items-center justify-between gap-2">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase {{ $tmpl['slots'] == 8 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : ($tmpl['slots'] == 6 ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-blue-500/20 text-blue-300 border border-blue-500/40') }}">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase {{ $isCustom ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : ($tmpl['slots'] == 8 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : ($tmpl['slots'] == 6 ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-blue-500/20 text-blue-300 border border-blue-500/40')) }}">
                             {{ $tmpl['badge'] ?? ($tmpl['slots'] . ' Poses') }}
                         </span>
 
@@ -185,7 +212,15 @@
                          style="background-color: {{ $tmpl['bg_color'] ?? '#1E293B' }};">
                         
                         <!-- Dynamic Mockup Layout Based on ID -->
-                        @if ($tmpl['id'] === 'party-8-grid')
+                        @if (!empty($tmpl['overlay_url']))
+                            <!-- Custom Uploaded Template Overlay -->
+                            <div class="w-full h-full flex items-center justify-center p-2 bg-slate-900/40 rounded-xl relative overflow-hidden">
+                                <img src="{{ $tmpl['overlay_url'] }}" alt="{{ $tmpl['name'] }}" class="max-h-full max-w-full object-contain rounded drop-shadow-md">
+                                <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-[#F5BD23] text-slate-950 text-[9px] font-black tracking-wider uppercase shadow">
+                                    Custom Frame
+                                </div>
+                            </div>
+                        @elseif ($tmpl['id'] === 'party-8-grid')
                             <!-- 8 Slots 2x4 Grid -->
                             <div class="w-full h-full flex flex-col justify-between p-1">
                                 <div class="text-center">
@@ -460,6 +495,20 @@
                 </div>
                 @endforeach
 
+                <!-- Empty Search State -->
+                <div id="booth-no-templates" class="hidden col-span-full py-16 text-center space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 text-slate-400 flex items-center justify-center text-2xl mx-auto">
+                        🔍
+                    </div>
+                    <h4 class="font-extrabold text-base text-white">Tidak Ada Template yang Cocok</h4>
+                    <p class="text-xs text-slate-400 max-w-sm mx-auto">
+                        Tidak ditemukan template sesuai kata kunci pencarian. Silakan coba kata kunci lain atau pilih tab Semua Desain.
+                    </p>
+                    <button type="button" onclick="clearBoothSearch()" class="px-5 py-2.5 rounded-xl bg-[#F5BD23] text-slate-950 font-black text-xs uppercase tracking-wider hover:bg-amber-400 transition">
+                        Reset Pencarian
+                    </button>
+                </div>
+
             </div>
 
             <!-- Sticky Bottom Confirmation Dock -->
@@ -645,13 +694,43 @@
             }
         }
 
+        let currentBoothCategory = 'all';
+        let currentBoothSearch = '';
+
+        function handleBoothSearch(val) {
+            currentBoothSearch = (val || '').trim().toLowerCase();
+            const clearBtn = document.getElementById('booth-search-clear');
+            if (clearBtn) {
+                if (currentBoothSearch.length > 0) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                }
+            }
+            applyBoothFilters();
+        }
+
+        function clearBoothSearch() {
+            const input = document.getElementById('booth-template-search');
+            if (input) input.value = '';
+            currentBoothSearch = '';
+            const clearBtn = document.getElementById('booth-search-clear');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            applyBoothFilters();
+        }
+
         function filterCategory(cat) {
+            currentBoothCategory = cat;
+            applyBoothFilters();
+        }
+
+        function applyBoothFilters() {
             // Update tabs styling
-            const tabs = ['all', '8_slots', '6_slots', '4_slots', 'other_slots'];
+            const tabs = ['all', 'custom', '8_slots', '6_slots', '4_slots', 'other_slots'];
             tabs.forEach(t => {
                 const el = document.getElementById('tab-' + t);
                 if (!el) return;
-                if (t === cat) {
+                if (t === currentBoothCategory) {
                     el.className = 'filter-tab px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition whitespace-nowrap bg-[#F5BD23] text-slate-950 shadow-lg shadow-amber-500/20';
                 } else {
                     el.className = 'filter-tab px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition whitespace-nowrap bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10';
@@ -660,14 +739,49 @@
 
             // Filter cards
             const cards = document.querySelectorAll('.template-card');
+            let visibleCount = 0;
+
             cards.forEach(card => {
                 const cardCat = card.getAttribute('data-category');
-                if (cat === 'all' || cardCat === cat) {
+                const isCustom = card.getAttribute('data-custom') === '1';
+                const name = card.getAttribute('data-name') || '';
+                const desc = card.getAttribute('data-desc') || '';
+                const slots = card.getAttribute('data-slots') || '';
+
+                let matchesCat = false;
+                if (currentBoothCategory === 'all') {
+                    matchesCat = true;
+                } else if (currentBoothCategory === 'custom') {
+                    matchesCat = isCustom;
+                } else {
+                    matchesCat = (cardCat === currentBoothCategory);
+                }
+
+                let matchesSearch = true;
+                if (currentBoothSearch) {
+                    const searchSlotMatch = currentBoothSearch.replace(/[^0-9]/g, '');
+                    matchesSearch = name.includes(currentBoothSearch) ||
+                                    desc.includes(currentBoothSearch) ||
+                                    (isCustom && 'kustom custom'.includes(currentBoothSearch)) ||
+                                    (searchSlotMatch && slots === searchSlotMatch);
+                }
+
+                if (matchesCat && matchesSearch) {
                     card.style.display = 'flex';
+                    visibleCount++;
                 } else {
                     card.style.display = 'none';
                 }
             });
+
+            const noTemplatesEl = document.getElementById('booth-no-templates');
+            if (noTemplatesEl) {
+                if (visibleCount === 0) {
+                    noTemplatesEl.classList.remove('hidden');
+                } else {
+                    noTemplatesEl.classList.add('hidden');
+                }
+            }
         }
 
         // ========================================================
@@ -873,6 +987,16 @@
             }
 
             ctx.restore();
+
+            // 5. Draw Custom Overlay if present
+            if (tmpl.overlay_url) {
+                const overlayImg = new Image();
+                overlayImg.crossOrigin = 'anonymous';
+                overlayImg.onload = () => {
+                    ctx.drawImage(overlayImg, 0, 0, canvas.width, canvas.height);
+                };
+                overlayImg.src = tmpl.overlay_url;
+            }
         }
 
         // Initialize on load with selected template & frame color

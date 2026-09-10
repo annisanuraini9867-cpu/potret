@@ -95,6 +95,49 @@ class AdminPanelTest extends TestCase
         $response->assertSee('Duo Bestie Split');
     }
 
+    public function test_admin_templates_page_displays_search_and_custom_templates(): void
+    {
+        \App\Models\StudioSetting::set('custom_templates', json_encode([
+            [
+                'id'             => 'custom-test-autumn',
+                'name'           => 'Autumn Mood Vintage',
+                'category'       => '4_slots',
+                'category_label' => '4 Kolase',
+                'frames'         => '4 Frames',
+                'slots'          => 4,
+                'badge'          => '✨ Kustom',
+                'aspect'         => '1200 x 1800 px',
+                'bg_color'       => '#FFF8E7',
+                'description'    => 'Template nuansa musim gugur kustom.',
+                'overlay_url'    => 'http://127.0.0.1:8000/storage/templates/overlays/autumn.png',
+                'is_custom'      => true,
+            ]
+        ]));
+
+        $response = $this->actingAs($this->admin)->get(route('admin.templates'));
+        $response->assertStatus(200);
+        $response->assertSee('admin-template-search');
+        $response->assertSee('Autumn Mood Vintage');
+        $response->assertSee('✨ Kustom');
+    }
+
+    public function test_admin_can_delete_custom_template(): void
+    {
+        \App\Models\StudioSetting::set('custom_templates', json_encode([
+            [
+                'id'        => 'custom-to-delete',
+                'name'      => 'Delete Me Template',
+                'is_custom' => true,
+            ]
+        ]));
+
+        $response = $this->actingAs($this->admin)->delete(route('admin.templates.delete', 'custom-to-delete'));
+        $response->assertRedirect();
+
+        $saved = json_decode(\App\Models\StudioSetting::get('custom_templates', '[]'), true);
+        $this->assertEmpty($saved);
+    }
+
     public function test_admin_status_page_can_be_rendered(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.status'));

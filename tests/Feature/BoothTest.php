@@ -152,4 +152,30 @@ class BoothTest extends TestCase
         $this->assertEquals(1, Photo::where('booking_id', $booking->id)->where('is_collage', true)->count());
         $this->assertEquals(6, Photo::where('booking_id', $booking->id)->where('is_collage', false)->count());
     }
+
+    public function test_booth_template_selection_page_displays_search_and_custom_templates(): void
+    {
+        \App\Models\StudioSetting::set('custom_templates', json_encode([
+            [
+                'id'             => 'custom-test-winter',
+                'name'           => 'Winter Wonder Glow',
+                'category'       => '6_slots',
+                'category_label' => '6 Kolase',
+                'frames'         => '6 Frames',
+                'slots'          => 6,
+                'badge'          => '✨ Kustom',
+                'aspect'         => '1200 x 1800 px',
+                'bg_color'       => '#0F172A',
+                'description'    => 'Template musim dingin kustom.',
+                'overlay_url'    => 'http://127.0.0.1:8000/storage/templates/overlays/winter.png',
+                'is_custom'      => true,
+            ]
+        ]));
+
+        $response = $this->get(route('booth.start.template'));
+        $response->assertStatus(200);
+        $response->assertSee('booth-template-search');
+        $response->assertSee('Winter Wonder Glow');
+        $response->assertSee('✨ Kustom');
+    }
 }
